@@ -1,6 +1,5 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.model;
 
-import java.util.Comparator;
 import java.util.HashSet;
 
 public class User 
@@ -38,20 +37,4 @@ public class User
 		return userName;
 	}
 	
-	//TODO: add throws statement to method in case accountID already exists
-	public void addAccountID(long accountID) 
-	{
-		accountIDs.add(accountID);
-		
-	}
-	
-}
-
-class UserCompare implements Comparator<User>
-{
-	public int compare(User u1, User u2)
-	{
-		return u1.getUserID().compareTo(u2.getUserID());
-		
-	}
 }

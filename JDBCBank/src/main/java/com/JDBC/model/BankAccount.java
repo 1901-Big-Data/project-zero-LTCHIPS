@@ -1,6 +1,6 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.model;
 
-import java.util.Comparator;
+import com.JDBC.Exceptions.InsufficientFundsException;
 
 public class BankAccount
 {
@@ -32,25 +32,31 @@ public class BankAccount
 	
 	public void depositFunds(long fundsArg) 
 	{
-		//TODO: create an exception 
-		funds+=fundsArg;
+		if (fundsArg < 0) 
+		{
+			throw new IllegalArgumentException("Cannot deposit a negative number!");
+			
+		} 
+		else 
+		{
+			funds+=fundsArg;
+		}
+		
 	}
 	
 	public void withdrawlFunds(long amountToWithdrawl) throws InsufficientFundsException 
 	{
-		if((funds-=amountToWithdrawl) < 0) 
+		
+		
+		if((funds-amountToWithdrawl) < 0) 
 		{
 			throw new InsufficientFundsException("Insufficient funds.");
+		}
+		else 
+		{
+			funds-=amountToWithdrawl;
 		}
 	}
 	
 }
 
-class BankAccountComparator implements Comparator<BankAccount>
-{
-	@Override
-	public int compare(BankAccount o1, BankAccount o2) 
-	{
-		return (o1.getAccountID() == o2.getAccountID()) ? 0 : -1;
-	}
-}

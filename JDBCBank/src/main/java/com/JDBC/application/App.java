@@ -1,7 +1,12 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.application;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Scanner;
+
+import com.JDBC.dao.BankAccountDAO;
+import com.JDBC.dao.UserDAO;
+import com.JDBC.model.User;
 
 
 public class App 
@@ -38,9 +43,19 @@ public class App
 		
 	}
 	
+	public static void LoopLogin()
+	{
+		
+		
+	}
+	
     public static void main( String[] args )
     {
     	Scanner inputScan = new Scanner(System.in);
+    	
+    	UserDAO userDAO = new UserDAO();
+    	
+    	BankAccountDAO bankAccountDAO = new BankAccountDAO();
     	
     	printGreeting();
     	
@@ -79,6 +94,20 @@ public class App
     		{
     			printHelp();
     		}
+    		else if (inputStr.equals("register")) 
+    		{
+    			System.out.print("Please give a User Name: ");
+    			String username = inputScan.next();
+    			
+    			System.out.print("Please give a Password:");
+    			
+    			String password = inputScan.next();
+    			
+    			User newUser = new User(username, 123, new HashSet<Long>());
+    			
+    			userDAO.saveUser(newUser);
+    			
+    		}
     		else if (inputStr.equals("logout")) 
     		{
     			System.out.println("user has logged out");
@@ -89,7 +118,6 @@ public class App
     			System.out.println("Invalid Command");
     			System.out.println("Type 'help' to see a list of valid commands.");
     		}
-    		
     		
     	}
     	

@@ -1,13 +1,15 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.dao;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IUserDAO<User>
+import com.JDBC.model.User;
+
+public interface IUserDAO
 {
-	Optional<User> getUserById(long id);
+	Optional<User> getUserByName(String name);
 	
-	List<User> getAllUsers();
+	Optional<List<User>> getAllUsers();
 	
 	void saveUser(User user);
 	

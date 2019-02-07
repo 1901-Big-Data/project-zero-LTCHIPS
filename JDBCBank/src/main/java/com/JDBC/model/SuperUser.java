@@ -1,4 +1,4 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.model;
 
 import java.util.HashSet;
 

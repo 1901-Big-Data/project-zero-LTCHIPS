@@ -1,7 +1,10 @@
-package com.JDBC.JDBCBank;
+package com.JDBC.dao;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.JDBC.Exceptions.InsufficientFundsException;
+import com.JDBC.model.BankAccount;
 
 public interface IBankAccountDAO 
 {	

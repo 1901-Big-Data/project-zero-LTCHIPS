@@ -31,18 +31,8 @@ public class BankAccountService {
 	}
 	
 	public Optional<List<BankAccount>> getAllBankAccounts()
-	{
-		
-		
-		
-		return null;
+	{	
+		return bankDAO.getAllBankAccounts();
 	}
-	
-	public Optional<BankAccount> getBankAccountByUserId(long id)
-	{
-		return null;
-		
-	}
-	
 	
 }

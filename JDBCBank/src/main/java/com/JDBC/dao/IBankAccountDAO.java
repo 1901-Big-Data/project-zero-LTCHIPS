@@ -8,11 +8,10 @@ import com.JDBC.model.BankAccount;
 
 public interface IBankAccountDAO 
 {	
-	Optional<BankAccount> getBankAccountById(long bankAccountId);
 	
-	List<BankAccount> getAllBankAccounts();
+	Optional<List<BankAccount>> getAllBankAccounts();
 	
-	List<BankAccount> getAllUsersBankAccount(long userId) throws Exception;
+	Optional<List<BankAccount>> getAllUsersBankAccount(long userId) throws Exception;
 	
 	public void depositFunds(long fundsArg);
 	

@@ -20,6 +20,15 @@ public class User
 		accountIDs = accountIDsArg;
 		
 	}
+	public User(String userNameArg, long userIDArg) 
+	{
+		userID = userIDArg;
+		
+		userName = userNameArg;
+		
+		accountIDs = new HashSet<Long>();
+		
+	}
 	
 	public Long getUserID() 
 	{

@@ -1,12 +1,15 @@
 package com.JDBC.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.sql.SQLException;
 import java.sql.Connection;
-
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import com.JDBC.model.User;
+import com.JDBC.util.ConnectionUtility;
 
 
 public class UserDAO implements IUserDAO
@@ -39,8 +42,38 @@ public class UserDAO implements IUserDAO
 	}
 
 	@Override
-	public Optional<List<User>> getAllUsers() {
+	public Optional<List<User>> getAllUsers() 
+	{
 		
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) {
+			return Optional.empty();
+		}
+
+		try {
+			String sql = "select * from users;";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			List<User> listOfUsers = new ArrayList<User>();
+
+			while (rs.next()) {
+				listOfUsers.add(new User( rs.getString("username"), rs.getLong(0)));
+			}
+			
+			return Optional.of(listOfUsers);
+			//return log.traceExit(Optional.of(listOfChampions));
+		} catch (SQLException e) {
+			//log.catching(e);
+			//log.error("Sql Exception ovcured", e);
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 		return null;
 	}
 

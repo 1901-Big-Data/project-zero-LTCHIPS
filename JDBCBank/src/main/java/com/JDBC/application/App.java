@@ -7,6 +7,8 @@ import java.util.Scanner;
 import com.JDBC.dao.BankAccountDAO;
 import com.JDBC.dao.UserDAO;
 import com.JDBC.model.User;
+import com.JDBC.service.BankAccountService;
+import com.JDBC.service.UserService;
 
 
 public class App 
@@ -53,9 +55,16 @@ public class App
     {
     	Scanner inputScan = new Scanner(System.in);
     	
-    	UserDAO userDAO = new UserDAO();
+    	//UserDAO userDAO = new UserDAO();
     	
-    	BankAccountDAO bankAccountDAO = new BankAccountDAO();
+    	//BankAccountDAO bankAccountDAO = new BankAccountDAO();
+    	
+    	UserService userServ = UserService.getService();
+    	
+    	BankAccountService bankServ = BankAccountService.getService();
+    	
+    	userServ.getUsers();
+    	
     	
     	printGreeting();
     	
@@ -105,7 +114,7 @@ public class App
     			
     			User newUser = new User(username, 123, new HashSet<Long>());
     			
-    			userDAO.saveUser(newUser);
+    			//userDAO.saveUser(newUser);
     			
     		}
     		else if (inputStr.equals("logout")) 

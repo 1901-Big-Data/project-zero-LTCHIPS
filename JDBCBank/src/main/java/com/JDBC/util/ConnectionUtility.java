@@ -42,7 +42,7 @@ public class ConnectionUtility
 			return connectionInstance;
 		}  catch (IOException ioe) 
 		{
-			System.out.println("There was a problem connecting to the database.");
+			System.out.println("There was a problem reading the config file for database connection.");
 			
 		} catch(SQLException sqle) 
 		{
@@ -52,13 +52,15 @@ public class ConnectionUtility
 		{
 			System.out.println("A class was not found (likely something wrong with JDBC driver)");
 		}
-		//finally {
-			//try {
-				//in.close();
-			//} catch (IOException e) {
-
-			//}
-		//}
+		finally 
+		{
+			try {
+				in.close();
+			} catch (IOException e) {
+				System.out.println("Couldn't close file input stream!");
+			}
+			
+		}
 
 		return null;
 	}

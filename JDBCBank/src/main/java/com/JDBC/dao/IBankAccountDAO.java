@@ -11,13 +11,13 @@ public interface IBankAccountDAO
 	
 	Optional<List<BankAccount>> getAllBankAccounts();
 	
-	Optional<List<BankAccount>> getAllUsersBankAccount(long userId) throws Exception;
+	Optional<List<BankAccount>> getAllUsersBankAccount(long userId);
 	
-	public void depositFunds(long fundsArg);
+	public void depositIntoBankAccount(double amount, long accountid);
 	
-	public void withdrawlFunds(long amountToWithdrawl) throws InsufficientFundsException;
+	public void withdrawlFunds(double amountToWithdrawl, long accountid) throws InsufficientFundsException;
 	
-	void saveBankAccount(BankAccount accnt);
+	Optional<BankAccount> addBankAccount(String bankAccountName, long userid);
 	
 	void updateBankAccount(BankAccount accnt, String [] params);
 	

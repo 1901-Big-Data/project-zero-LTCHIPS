@@ -1,14 +1,18 @@
 package com.JDBC.application;
 
+import java.io.ObjectInputStream.GetField;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 
-import com.JDBC.dao.BankAccountDAO;
-import com.JDBC.dao.UserDAO;
+import com.JDBC.Exceptions.InsufficientFundsException;
+import com.JDBC.model.BankAccount;
 import com.JDBC.model.User;
 import com.JDBC.service.BankAccountService;
 import com.JDBC.service.UserService;
+import com.JDBC.util.ScannerSingleton;
 
 
 public class App 
@@ -45,92 +49,341 @@ public class App
 		
 	}
 	
-	public static void LoopLogin()
-	{
+	
+	
+	public static User LoopLogin()
+	{		
+		Scanner inputScan = ScannerSingleton.getScanner();
 		
+		UserService userService = UserService.getService();
+		
+		User returnUser;
+		
+		//while(true) 
+		//{
+			System.out.print("Username: ");
+			
+			String userNameIn = inputScan.next();
+			
+			System.out.print("Password: ");
+			
+			String passwordIn = inputScan.next();
+			
+			try 
+			{
+				returnUser = userService.login(userNameIn, passwordIn).get();
+				
+			}
+			catch(NoSuchElementException nsee) 
+			{
+				System.out.println("Username or password incorrect.");
+				return null;
+			}
+			
+		//}
+		
+		//inputScan.close();
+		
+		return returnUser;
+		
+	}
+	
+	public static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
+	{
+		System.out.println(curUser.getUserName() + " Current Bank Accounts: \n");
+		for (int x = 0; x < userBankAccounts.size(); x++) 
+		{
+			System.out.print((x + 1) + ":");
+			
+			System.out.print("Name: ");
+			System.out.print(userBankAccounts.get(x).getName());
+			System.out.println("\t \t");
+			
+			System.out.print("Funds: $");
+			System.out.print(userBankAccounts.get(x).getBalance());
+			System.out.println();
+			
+		}
+		
+	}
+	
+	public static void dashboard(User curUser) 
+	{
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		BankAccountService bankService = BankAccountService.getService();
+		
+		while(true) 
+		{
+			System.out.println("1. Create an account");
+			System.out.println("2. Views your current account balances");
+			System.out.println("3. Deletes current account");
+			System.out.println("4. Make a deposit to an existing account");
+			System.out.println("5. Make a withdrawl from current account");
+			System.out.println("6. Logout");
+			
+			System.out.print(">");
+			
+			if (inputScan.nextInt() == 1) 
+			{
+				System.out.println();
+				System.out.print("Enter a name for the account: ");
+				String newBankAccountName = inputScan.next();
+				
+				bankService.addBankAccount(newBankAccountName, curUser.getUserID());
+				
+			}
+			else if (inputScan.nextInt() == 2) 
+			{
+			
+				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
+				
+				if (userBankAccounts.isEmpty()) 
+				{
+					System.out.println("User currently has no bank accounts");
+					
+				}
+				else 
+				{
+					PrintBankAccounts(curUser, userBankAccounts);
+				}
+			}
+			else if (inputScan.nextInt() == 3) 
+			{
+				
+			}
+			else if (inputScan.nextInt() == 4) 
+			{
+				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
+				
+				long bankid;
+				
+				if (userBankAccounts.size() > 1) 
+				{
+					PrintBankAccounts(curUser, userBankAccounts);
+					System.out.println();
+					
+					
+					int chosenAccount = 0;
+					
+					while(true) 
+					{
+						System.out.print("Choose Account to deposit into: ");
+						chosenAccount = inputScan.nextInt();
+						if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
+						{
+							System.out.println("Invalid choice");
+							
+						}
+						else 
+						{
+							break;
+						}
+					}
+					
+					bankid = userBankAccounts.get(chosenAccount - 1).getAccountID();
+					
+				}
+				else 
+				{
+					bankid = userBankAccounts.get(0).getAccountID();
+				}
+				
+				System.out.print("Specify how much you wish to deposit: ");
+				Double amountToDeposit = inputScan.nextDouble();
+				
+				bankService.depositIntoBankAccount(amountToDeposit, bankid);
+				
+			}
+			else if (inputScan.nextInt() == 5) 
+			{
+				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
+				
+				BankAccount bankAccount;
+				
+				if (userBankAccounts.size() > 1) 
+				{
+					PrintBankAccounts(curUser, userBankAccounts);
+					System.out.println();
+					
+					
+					int chosenAccount = 0;
+					
+					while(true) 
+					{
+						System.out.print("Choose Account to withdraw from: ");
+						chosenAccount = inputScan.nextInt();
+						if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
+						{
+							System.out.println("Invalid choice");
+							
+						}
+						else 
+						{
+							break;
+						}
+					}	
+					
+					bankAccount = userBankAccounts.get(chosenAccount - 1);
+					
+				}
+				else 
+				{
+					bankAccount = userBankAccounts.get(0);
+				}
+				
+				System.out.print("Enter amount to Withdraw: ");
+				
+				double amountToWithdraw = inputScan.nextDouble();
+				
+				try {
+					bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID());
+				} catch (InsufficientFundsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			else if (inputScan.nextInt() == 6) 
+			{
+				System.out.println("Logging off, have a nice day!");
+				break;
+			}
+			
+		}
+		
+	}
+	
+	public static User register() 
+	{
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		UserService userService = UserService.getService();
+		
+		User newUser;
+		
+		while(true)
+		{
+			System.out.println("Enter a Username: ");
+			
+			String userNameIn = inputScan.next();
+			
+			String passwordIn = "";
+			
+			String passwordCheck = " ";
+			
+			while(!passwordIn.equals(passwordCheck)) 
+			{
+				System.out.print("Enter a Password: ");
+				
+				passwordIn = inputScan.next();
+				
+				System.out.print("Confirm Password: ");
+				
+				passwordCheck = inputScan.next();
+				
+			}			
+			
+			//TODO: COME UP WITH AN EXCEPTION TO THROW IF USERNAME ALREADY EXISTS
+
+			//try 
+			//{
+				newUser = userService.register(userNameIn, passwordIn).get();
+				
+			//}
+			//finally
+			//{
+				//inputScan.close();
+				
+			//}
+			
+			if (newUser != null) 
+			{
+				break;
+				
+			}
+			
+			
+		}
+		
+		
+		
+		return newUser;
 		
 	}
 	
     public static void main( String[] args )
     {
-    	Scanner inputScan = new Scanner(System.in);
+    	Scanner scanner = ScannerSingleton.getScanner();
+    	
+    	printGreeting();
     	
     	//UserDAO userDAO = new UserDAO();
     	
     	//BankAccountDAO bankAccountDAO = new BankAccountDAO();
     	
-    	UserService userServ = UserService.getService();
+		/*
+		 * UserService userServ = UserService.getService();
+		 * 
+		 * BankAccountService bankServ = BankAccountService.getService();
+		 */
     	
-    	BankAccountService bankServ = BankAccountService.getService();
+    	User curUser = null;
     	
-    	userServ.getUsers();
-    	
-    	
-    	printGreeting();
-    	
-    	while(inputScan.next().toLowerCase().compareTo("exit") != 0) 
+    	while(true)
     	{
-    		//System.out.print("Please enter a command: ");
+    		System.out.println("Options: ");
+    		System.out.println("1. Login");
+    		System.out.println("2. Register");
+    		System.out.println("3. Exit");
+    		System.out.println();
     		
-    		String inputStr = inputScan.next().toLowerCase();
+    		System.out.print(">");
     		
-    		if (inputStr.equals("create")) 
+    		if (scanner.nextInt() == 1) 
     		{
-    			System.out.println("*creates account*");
-    			//do account creation stuff
+    			 curUser = LoopLogin();
+    			 
+    			 if (curUser != null) 
+    			 {
+    				 dashboard(curUser);
+    				 
+    			 }
     		}
-    		else if(inputStr.equals("view")) 
+    		else if (scanner.nextInt() == 2) 
     		{
-    			System.out.println("*views account*");
-    			//show accounts and balances
-    		}
-    		else if(inputStr.equals("delete"))
-    		{
-    			System.out.println("*deletes account*");
-    			//delete account
-    		}
-    		else if(inputStr.equals("deposit"))
-    		{
-    			System.out.println("*deposits money*");
-    			//deposit funds
-    		}
-    		else if(inputStr.equals("withdraw")) 
-    		{
-    			System.out.println("*withdraws money*");
-    			//withdraw funds
-    		}
-    		else if(inputStr.equals("help")) 
-    		{
-    			printHelp();
-    		}
-    		else if (inputStr.equals("register")) 
-    		{
-    			System.out.print("Please give a User Name: ");
-    			String username = inputScan.next();
-    			
-    			System.out.print("Please give a Password:");
-    			
-    			String password = inputScan.next();
-    			
-    			User newUser = new User(username, 123, new HashSet<Long>());
-    			
-    			//userDAO.saveUser(newUser);
+    			register();
     			
     		}
-    		else if (inputStr.equals("logout")) 
+    		else if (scanner.nextInt() == 3) 
     		{
-    			System.out.println("user has logged out");
-    			//logout stuff
+    			System.out.println("Exiting Application...");
+    			
+    			break;
+    			
     		}
     		else
     		{
     			System.out.println("Invalid Command");
-    			System.out.println("Type 'help' to see a list of valid commands.");
     		}
+    		
     		
     	}
     	
-    	inputScan.close();
+    	try 
+    	{
+    		ScannerSingleton.killScanner();
+    		
+    	}
+    	catch(Exception e) 
+    	{
+    		
+    		
+    	}
+    	
+    	
+    	
+    	
     	
     }
 }

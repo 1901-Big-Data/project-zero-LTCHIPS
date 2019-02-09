@@ -1,21 +1,21 @@
 package com.JDBC.model;
 
-import com.JDBC.Exceptions.InsufficientFundsException;
-
 public class BankAccount
 {
 	private long accountID;
-	private long funds;
+	private double funds;
+	private String name;
 	
 	
-	public BankAccount(long accountIDArg, long fundsArg)
+	public BankAccount(long accountIDArg, double fundsArg, String nameArg)
 	{
 		accountID = accountIDArg;
 		funds = fundsArg;
+		name = nameArg;
 		
 	}
 	
-	public long getBalance() 
+	public double getBalance() 
 	{
 		return funds;
 	}
@@ -25,37 +25,15 @@ public class BankAccount
 		return accountID;
 	}
 	
+	public String getName() 
+	{
+		return name;
+		
+	}
+	
 	public boolean isBalanceEmpty() 
 	{
 		return (funds == 0) ? true : false;
-	}
-	
-	public void depositFunds(long fundsArg) 
-	{
-		if (fundsArg < 0) 
-		{
-			throw new IllegalArgumentException("Cannot deposit a negative number!");
-			
-		} 
-		else 
-		{
-			funds+=fundsArg;
-		}
-		
-	}
-	
-	public void withdrawlFunds(long amountToWithdrawl) throws InsufficientFundsException 
-	{
-		
-		
-		if((funds-amountToWithdrawl) < 0) 
-		{
-			throw new InsufficientFundsException("Insufficient funds.");
-		}
-		else 
-		{
-			funds-=amountToWithdrawl;
-		}
 	}
 	
 }

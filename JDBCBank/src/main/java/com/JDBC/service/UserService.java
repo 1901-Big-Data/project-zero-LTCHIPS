@@ -30,6 +30,18 @@ public class UserService {
 		
 	}
 	
+	public Optional<User> login(String username, String password)
+	{
+		return userDAO.login(username, password);
+		
+	}
+	
+	public Optional<User> register(String username, String password)
+	{
+		return userDAO.register(username, password);
+		
+	}
+	
 	public Optional<List<User>> getUsers()
 	{
 		return userDAO.getAllUsers();

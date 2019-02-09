@@ -1,6 +1,5 @@
 package com.JDBC.application;
 
-import java.io.ObjectInputStream.GetField;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -88,9 +87,20 @@ public class App
 		
 	}
 	
-	public static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
+	public static void PrintBankAccounts(User curUser) 
 	{
-		System.out.println(curUser.getUserName() + " Current Bank Accounts: \n");
+		
+		BankAccountService bankService = BankAccountService.getService();
+		List<BankAccount> userBankAccounts = bankService .getAllUsersBankAccounts(curUser.getUserID()).get();
+		
+		if (userBankAccounts.isEmpty()) 
+		{
+			System.out.println("User currently has no bank accounts");
+			
+		}
+		
+		
+		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
 		{
 			System.out.print((x + 1) + ":");
@@ -111,10 +121,10 @@ public class App
 	{
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
-		BankAccountService bankService = BankAccountService.getService();
-		
 		while(true) 
 		{
+			
+			System.out.println("=====================MAIN MENU=======================");
 			System.out.println("1. Create an account");
 			System.out.println("2. Views your current account balances");
 			System.out.println("3. Deletes current account");
@@ -126,123 +136,24 @@ public class App
 			
 			if (inputScan.nextInt() == 1) 
 			{
-				System.out.println();
-				System.out.print("Enter a name for the account: ");
-				String newBankAccountName = inputScan.next();
-				
-				bankService.addBankAccount(newBankAccountName, curUser.getUserID());
-				
+				CreateAccount(curUser);	
 			}
 			else if (inputScan.nextInt() == 2) 
 			{
-			
-				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
-				
-				if (userBankAccounts.isEmpty()) 
-				{
-					System.out.println("User currently has no bank accounts");
-					
-				}
-				else 
-				{
-					PrintBankAccounts(curUser, userBankAccounts);
-				}
+				PrintBankAccounts(curUser);
 			}
 			else if (inputScan.nextInt() == 3) 
 			{
+				DeleteAccount(curUser);
 				
 			}
 			else if (inputScan.nextInt() == 4) 
 			{
-				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
-				
-				long bankid;
-				
-				if (userBankAccounts.size() > 1) 
-				{
-					PrintBankAccounts(curUser, userBankAccounts);
-					System.out.println();
-					
-					
-					int chosenAccount = 0;
-					
-					while(true) 
-					{
-						System.out.print("Choose Account to deposit into: ");
-						chosenAccount = inputScan.nextInt();
-						if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
-						{
-							System.out.println("Invalid choice");
-							
-						}
-						else 
-						{
-							break;
-						}
-					}
-					
-					bankid = userBankAccounts.get(chosenAccount - 1).getAccountID();
-					
-				}
-				else 
-				{
-					bankid = userBankAccounts.get(0).getAccountID();
-				}
-				
-				System.out.print("Specify how much you wish to deposit: ");
-				Double amountToDeposit = inputScan.nextDouble();
-				
-				bankService.depositIntoBankAccount(amountToDeposit, bankid);
-				
+				DepositIntoAccount(curUser);
 			}
 			else if (inputScan.nextInt() == 5) 
 			{
-				List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
-				
-				BankAccount bankAccount;
-				
-				if (userBankAccounts.size() > 1) 
-				{
-					PrintBankAccounts(curUser, userBankAccounts);
-					System.out.println();
-					
-					
-					int chosenAccount = 0;
-					
-					while(true) 
-					{
-						System.out.print("Choose Account to withdraw from: ");
-						chosenAccount = inputScan.nextInt();
-						if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
-						{
-							System.out.println("Invalid choice");
-							
-						}
-						else 
-						{
-							break;
-						}
-					}	
-					
-					bankAccount = userBankAccounts.get(chosenAccount - 1);
-					
-				}
-				else 
-				{
-					bankAccount = userBankAccounts.get(0);
-				}
-				
-				System.out.print("Enter amount to Withdraw: ");
-				
-				double amountToWithdraw = inputScan.nextDouble();
-				
-				try {
-					bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID());
-				} catch (InsufficientFundsException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				WithdrawFromAccount(curUser);
 			}
 			else if (inputScan.nextInt() == 6) 
 			{
@@ -254,6 +165,198 @@ public class App
 		
 	}
 	
+	private static void WithdrawFromAccount(User curUser) {
+		BankAccountService bankService = BankAccountService.getService();
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		
+		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
+		
+		BankAccount bankAccount;
+		
+		if (userBankAccounts.size() > 1) 
+		{
+			PrintBankAccounts(curUser, userBankAccounts);
+			System.out.println();
+			
+			
+			int chosenAccount = 0;
+			
+			while(true) 
+			{
+				System.out.print("Choose Account to withdraw from: ");
+				chosenAccount = inputScan.nextInt();
+				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
+				{
+					System.out.println("Invalid choice");
+					
+				}
+				else 
+				{
+					break;
+				}
+			}	
+			
+			bankAccount = userBankAccounts.get(chosenAccount - 1);
+			
+		}
+		else 
+		{
+			bankAccount = userBankAccounts.get(0);
+		}
+		
+		System.out.print("Enter amount to Withdraw: ");
+		
+		double amountToWithdraw = inputScan.nextDouble();
+		
+		try {
+			bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID());
+		} catch (InsufficientFundsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
+	{
+		if (userBankAccounts.isEmpty()) 
+		{
+			System.out.println("User currently has no bank accounts");
+			
+		}
+		
+		
+		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
+		for (int x = 0; x < userBankAccounts.size(); x++) 
+		{
+			System.out.print((x + 1) + ":");
+			
+			System.out.print("Name: ");
+			System.out.print(userBankAccounts.get(x).getName());
+			System.out.println("\t \t");
+			
+			System.out.print("Funds: $");
+			System.out.print(userBankAccounts.get(x).getBalance());
+			System.out.println();
+			
+		}
+		
+	}
+
+	public static void DepositIntoAccount(User curUser) {
+		BankAccountService bankService = BankAccountService.getService();
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		
+		List<BankAccount> userBankAccounts = bankService .getAllUsersBankAccounts(curUser.getUserID()).get();
+		
+		long bankid;
+		
+		if (userBankAccounts.size() > 1) 
+		{
+			PrintBankAccounts(curUser, userBankAccounts);
+			System.out.println();
+			
+			
+			int chosenAccount = 0;
+			
+			while(true) 
+			{
+				System.out.print("Choose Account to deposit into: ");
+				chosenAccount = inputScan.nextInt();
+				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
+				{
+					System.out.println("Invalid choice");
+					
+				}
+				else 
+				{
+					break;
+				}
+			}
+			
+			bankid = userBankAccounts.get(chosenAccount - 1).getAccountID();
+			
+		}
+		else 
+		{
+			bankid = userBankAccounts.get(0).getAccountID();
+		}
+		
+		System.out.print("Specify how much you wish to deposit: ");
+		Double amountToDeposit = inputScan.nextDouble();
+		
+		bankService.depositIntoBankAccount(amountToDeposit, bankid);
+		
+		
+	}
+
+	public static void DeleteAccount(User curUser) {
+		
+		BankAccountService bankService = BankAccountService.getService();
+		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
+		
+		BankAccount bankAccount;
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		if (userBankAccounts.size() > 1) 
+		{
+			PrintBankAccounts(curUser, userBankAccounts);
+			System.out.println();
+			
+			
+			int chosenAccount = 0;
+			
+			while(true) 
+			{
+				System.out.print("Choose Account to delete: ");
+				chosenAccount = inputScan.nextInt();
+				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
+				{
+					System.out.println("Invalid choice");
+					
+				}
+				else 
+				{
+					break;
+				}
+			}	
+			
+			bankAccount = userBankAccounts.get(chosenAccount - 1);
+			
+		}
+		else 
+		{
+			bankAccount = userBankAccounts.get(0);
+		}
+		
+		if (bankAccount.getBalance() > 0.0) 
+		{
+			throw new RuntimeException("Cannot delete account that still has funds inside!");
+			
+		}
+		
+		bankService.deleteBankAccount(bankAccount.getAccountID());
+		
+	}
+
+	public static void CreateAccount(User curUser) 
+	{
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		BankAccountService bankService = BankAccountService.getService();
+		
+		
+		System.out.println();
+		System.out.print("Enter a name for the account: ");
+		String newBankAccountName = inputScan.next();
+		
+		bankService.addBankAccount(newBankAccountName, curUser.getUserID());
+	}
+
 	public static User register() 
 	{
 		Scanner inputScan = ScannerSingleton.getScanner();

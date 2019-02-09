@@ -22,13 +22,11 @@ public class ScannerSingleton {
 	{
 		if(scannerThing == null) 
 		{
-			throw new Exception("Scanner has not been instantiated!");
-			
+			throw new Exception("Scanner has not been instantiated!");	
 		}
 		else 
 		{
 			scannerThing.close();
-			
 		}
 	}
 	

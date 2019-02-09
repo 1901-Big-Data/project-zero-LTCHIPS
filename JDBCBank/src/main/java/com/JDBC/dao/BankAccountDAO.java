@@ -250,8 +250,37 @@ public class BankAccountDAO implements IBankAccountDAO {
 	}
 
 	@Override
-	public void deleteBankAccount(BankAccount bnk) {
-		// TODO Auto-generated method stub
+	public void deleteBankAccount(long accountId) 
+	{
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null)
+			return;
+		try
+		{
+			
+			String query = "CALL removeAccount(?)"; //Should return the generated bankaccount id...
+			
+			CallableStatement queryStmt = con.prepareCall(query);
+			
+			queryStmt.setLong(1, accountId);
+			
+			//queryStmt.registerOutParameter(3, Types.NUMERIC);
+			
+			queryStmt.execute();
+			
+			//long bankAccountId = queryStmt.getLong(3);
+			
+			//return Optional.of(new BankAccount(bankAccountId, 0, bankAccountName));
+			
+		} catch(SQLException e) 
+		{
+			System.out.println("deleteBankAccount: SQL exception");
+			
+		}
+		//return Optional.empty();
+		
+		
 		
 	}
 	

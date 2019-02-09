@@ -58,6 +58,12 @@ public class BankAccountService {
 		
 	}
 	
+	public void deleteBankAccount(long accountId) 
+	{
+		bankDAO.deleteBankAccount(accountId);
+		
+	}
+	
 	
 	
 }

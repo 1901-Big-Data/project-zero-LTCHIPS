@@ -90,7 +90,7 @@ public class UserDAO implements IUserDAO
 		}
 
 		try {
-			String sql = "select * from users;";
+			String sql = "select * from users";
 			PreparedStatement ps = con.prepareStatement(sql);
 			ResultSet rs = ps.executeQuery();
 
@@ -129,7 +129,6 @@ public class UserDAO implements IUserDAO
 		}
 		try 
 		{
-			//String query = "SELECT * FROM users WHERE username = ? and password = ?";
 			
 			String query = "CALL userinsert(?, ?, ?)"; //Should return the generated user id...
 			
@@ -142,12 +141,8 @@ public class UserDAO implements IUserDAO
 			queryStmt.registerOutParameter(3, Types.NUMERIC);
 			
 			queryStmt.execute();
-			 
-			//ResultSet rs = queryStmt.executeQuery();
 			
 			long userid = queryStmt.getLong(3);
-			
-			//User loginUser = new User(rs.getString("username"), rs.getLong("userid"));
 			
 			return Optional.of(new User(username, userid));
 			

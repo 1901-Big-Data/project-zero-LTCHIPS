@@ -1,13 +1,17 @@
 package com.JDBC.application;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Properties;
 import java.util.Scanner;
 
 import com.JDBC.Exceptions.InsufficientFundsException;
 import com.JDBC.model.BankAccount;
+import com.JDBC.model.SuperUser;
 import com.JDBC.model.User;
 import com.JDBC.service.BankAccountService;
 import com.JDBC.service.UserService;
@@ -16,16 +20,6 @@ import com.JDBC.util.ScannerSingleton;
 
 public class App 
 {
-	public static void printHelp() 
-	{
-		System.out.println("CREATE - Creates an account.");
-		System.out.println("VIEW - Views your current account balances.");
-		System.out.println("DELETE - Deletes current account.");
-		System.out.println("DEPOSIT - Make a deposit to current account.");
-		System.out.println("WITHDRAW - Make a withdrawl from current account.");
-		System.out.println("HELP - Displays this hopefully helpful message.");
-		
-	}
 	
 	public static void printGreeting() 
 	{
@@ -40,16 +34,45 @@ public class App
 		
 		System.out.println();
 		
-		//System.out.print("The time is " );
-		//System.out.print(now.getHour() % 12 + ":");
-		//System.out.print(now.getMinute());
-		
-		//System.out.println();
-		
 	}
 	
 	
-	
+	public static SuperUser SuperLogin(String usernameArg, String passwordArg) 
+	{
+		
+		InputStream in;
+		
+		try {
+			// load information from properties file
+			Properties props = new Properties();
+			in = new FileInputStream(
+					"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\admin.properties");
+			props.load(in);
+			
+			String username = props.getProperty("jdbc.admin.username");
+			String password = props.getProperty("jdbc.admin.password");
+			
+			if (usernameArg.equals(username)) 
+			{
+				if(passwordArg.equals(password)) 
+				{
+					return new SuperUser(username, (long)1234);
+				}
+			}
+			else 
+			{
+				return null;
+			}
+
+		}  catch (IOException ioe) 
+		{
+			//System.out.println("There was a problem reading the config file for database connection.");
+			return null;
+		}
+		return null;
+		
+		
+	}
 	public static User LoopLogin()
 	{		
 		Scanner inputScan = ScannerSingleton.getScanner();
@@ -58,30 +81,26 @@ public class App
 		
 		User returnUser;
 		
-		//while(true) 
-		//{
-			System.out.print("Username: ");
+		System.out.print("Username: ");
 			
-			String userNameIn = inputScan.next();
+		String userNameIn = inputScan.next();
 			
-			System.out.print("Password: ");
+		System.out.print("Password: ");
 			
-			String passwordIn = inputScan.next();
+		String passwordIn = inputScan.next();
 			
-			try 
-			{
+		try
+		{
+			returnUser = SuperLogin(userNameIn, passwordIn);
+			
+			if (returnUser == null)
 				returnUser = userService.login(userNameIn, passwordIn).get();
-				
-			}
-			catch(NoSuchElementException nsee) 
-			{
-				System.out.println("Username or password incorrect.");
-				return null;
-			}
-			
-		//}
-		
-		//inputScan.close();
+		}
+		catch(NoSuchElementException nsee) 
+		{
+			System.out.println("Username or password incorrect.");
+			return null;
+		}
 		
 		return returnUser;
 		
@@ -144,8 +163,7 @@ public class App
 			}
 			else if (inputScan.nextInt() == 3) 
 			{
-				DeleteAccount(curUser);
-				
+				DeleteAccount(curUser);	
 			}
 			else if (inputScan.nextInt() == 4) 
 			{
@@ -409,8 +427,6 @@ public class App
 			
 		}
 		
-		
-		
 		return newUser;
 		
 	}
@@ -420,18 +436,6 @@ public class App
     	Scanner scanner = ScannerSingleton.getScanner();
     	
     	printGreeting();
-    	
-    	//UserDAO userDAO = new UserDAO();
-    	
-    	//BankAccountDAO bankAccountDAO = new BankAccountDAO();
-    	
-		/*
-		 * UserService userServ = UserService.getService();
-		 * 
-		 * BankAccountService bankServ = BankAccountService.getService();
-		 */
-    	
-    	User curUser = null;
     	
     	while(true)
     	{
@@ -445,13 +449,20 @@ public class App
     		
     		if (scanner.nextInt() == 1) 
     		{
-    			 curUser = LoopLogin();
-    			 
-    			 if (curUser != null) 
-    			 {
+    			User curUser = null;
+    			
+    			curUser = LoopLogin();
+    			
+    			if (curUser instanceof SuperUser) 
+    			{
+    				adminDashboard();
+    			}
+    			
+    			else if (curUser instanceof User && curUser != null) 
+    			{
     				 dashboard(curUser);
     				 
-    			 }
+    			}
     		}
     		else if (scanner.nextInt() == 2) 
     		{
@@ -483,10 +494,65 @@ public class App
     		
     		
     	}
-    	
-    	
-    	
-    	
-    	
+    	    	
     }
+
+
+	private static void adminDashboard() {
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		//System.out.println("Admin login detected.");
+		
+		
+		while(true) 
+		{
+			System.out.println("=====================ADMIN MENU=======================");
+			System.out.println("1. View users");
+			System.out.println("2. Create user");
+			System.out.println("3. Update user");
+			System.out.println("4. Delete user");
+			System.out.println("5. Logout");
+			
+			if (inputScan.nextInt() == 1) 
+			{
+				ViewUsers();
+				
+			}
+			
+		}
+		
+		
+	}
+
+
+	private static void ViewUsers() {
+		UserService serv = UserService.getService();
+		List<User> users;
+		
+		try {
+			users = serv.getUsers().get();
+		}
+		catch(NoSuchElementException nsee) 
+		{
+			System.out.println("No users currently are avaliable.");
+			return;
+		}
+		
+		System.out.println("=========Current Users========");
+		for(int x = 0; x < users.size(); x++) 
+		{
+			System.out.print("User: ");
+			System.out.print(users.get(x).getUserName());
+			System.out.print("\t \t " + "ID: ");
+			System.out.println(users.get(x).getUserID());
+			
+		}
+		System.out.println();
+		
+		
+		
+	}
+
+	
 }
+

@@ -15,10 +15,6 @@ public interface IUserDAO
 	
 	Optional<User> register(String username, String password);
 	
-		
-		
-	
-	
 	void updateUser(User User, String [] params);
 	
 	void deleteUser(User User);

@@ -1,12 +1,10 @@
 package com.JDBC.model;
 
-import java.util.HashSet;
-
 public class SuperUser extends User
 {
-	public SuperUser(String userNameArg, long userIDArg, HashSet<Long> accountIDsArg) 
+	public SuperUser(String userNameArg, long userIDArg) 
 	{
-		super(userNameArg, userIDArg, accountIDsArg);	
+		super(userNameArg, userIDArg);
 	}
 
 }

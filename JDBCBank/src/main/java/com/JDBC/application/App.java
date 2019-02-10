@@ -534,7 +534,29 @@ public class App
 	}
 
 
-	private static void UpdateUserPassword() {
+	private static void UpdateUserPassword() 
+	{
+		UserService serv = UserService.getService();
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		System.out.print("Enter username of user to update password: ");
+		
+		String username = inputScan.next();
+		
+		System.out.print("Enter new password: ");
+		
+		String pwordFirstAttmpt = inputScan.next();
+		
+		System.out.print("Confirm password: ");
+		
+		String pwordSecondAttmpt = inputScan.next();
+		
+		if (pwordFirstAttmpt.equals(pwordSecondAttmpt)) 
+		{
+			serv.updateUserPassword(username, pwordSecondAttmpt);
+			
+		}
 		
 		
 	}

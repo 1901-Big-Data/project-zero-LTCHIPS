@@ -54,6 +54,12 @@ public class UserService {
 		
 	}
 	
+	public void updateUserPassword(String username, String newPassword) 
+	{
+		userDAO.updateUserPassword(username, newPassword);
+		
+	}
+	
 	public void deleteUser(String username) 
 	{
 		userDAO.deleteUser(username);

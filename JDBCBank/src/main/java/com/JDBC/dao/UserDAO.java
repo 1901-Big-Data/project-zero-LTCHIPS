@@ -148,7 +148,7 @@ public class UserDAO implements IUserDAO
 			
 		} catch(SQLException e) 
 		{
-			System.out.println("login: SQL exception");
+			System.out.println("register: SQL exception");
 			
 		}
 		return Optional.empty();
@@ -156,8 +156,32 @@ public class UserDAO implements IUserDAO
 	}
 
 	@Override
-	public void updateUser(User User, String[] params) {
-		// TODO Auto-generated method stub
+	public void updateUserPassword(String username, String newPassword) {
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) 
+		{
+			return;	
+		}
+		try 
+		{
+			String query = "CALL updateuserpassword(?, ?)"; //Should return the generated user id...
+			
+			CallableStatement queryStmt = con.prepareCall(query);
+			
+			queryStmt.setString(1,  username);
+			
+			queryStmt.setString(2,  newPassword);
+			
+			queryStmt.execute();
+			
+		} catch(SQLException e) 
+		{
+			System.out.println("updateUserPassword: SQL exception");
+			
+		}
+		//return Optional.empty();
+		
 		
 	}
 

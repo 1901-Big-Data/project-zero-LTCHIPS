@@ -162,8 +162,40 @@ public class UserDAO implements IUserDAO
 	}
 
 	@Override
-	public void deleteUser(User User) {
-		// TODO Auto-generated method stub
+	public void deleteUser(String userName) {
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) 
+		{
+			//return Optional.empty();
+			return;
+			
+		}
+		try 
+		{
+			
+			String query = "CALL removeuser(?)"; //Should return the generated user id...
+			
+			CallableStatement queryStmt = con.prepareCall(query);
+			
+			queryStmt.setString(1,  userName);
+			
+			//queryStmt.setString(2,  password);
+			
+			//queryStmt.registerOutParameter(3, Types.NUMERIC);
+			
+			queryStmt.execute();
+			
+			//long userid = queryStmt.getLong(3);
+			
+			//return Optional.of(new User(username, userid));
+			
+		} catch(SQLException e) 
+		{
+			System.out.println("deleteUser: SQL exception");
+			
+		}
+		//return Optional.empty();
 		
 	}
 

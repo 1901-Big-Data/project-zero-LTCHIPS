@@ -17,6 +17,6 @@ public interface IUserDAO
 	
 	void updateUser(User User, String [] params);
 	
-	void deleteUser(User User);
+	void deleteUser(String userName);
 	
 }

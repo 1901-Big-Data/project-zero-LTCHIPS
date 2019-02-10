@@ -144,11 +144,11 @@ public class App
 		{
 			
 			System.out.println("=====================MAIN MENU=======================");
-			System.out.println("1. Create an account");
+			System.out.println("1. Create a bank account");
 			System.out.println("2. Views your current account balances");
-			System.out.println("3. Deletes current account");
+			System.out.println("3. Delete a bank account");
 			System.out.println("4. Make a deposit to an existing account");
-			System.out.println("5. Make a withdrawl from current account");
+			System.out.println("5. Make a withdrawl from an existing account");
 			System.out.println("6. Logout");
 			
 			System.out.print(">");
@@ -244,7 +244,6 @@ public class App
 			
 		}
 		
-		
 		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
 		{
@@ -252,7 +251,7 @@ public class App
 			
 			System.out.print("Name: ");
 			System.out.print(userBankAccounts.get(x).getName());
-			System.out.println("\t \t");
+			System.out.print("\t \t");
 			
 			System.out.print("Funds: $");
 			System.out.print(userBankAccounts.get(x).getBalance());
@@ -479,8 +478,7 @@ public class App
     		else
     		{
     			System.out.println("Invalid Command");
-    		}
-    		
+    		}    		
     		
     	}
     	
@@ -497,35 +495,68 @@ public class App
     	    	
     }
 
-
 	private static void adminDashboard() {
 		
 		Scanner inputScan = ScannerSingleton.getScanner();
-		//System.out.println("Admin login detected.");
-		
 		
 		while(true) 
 		{
 			System.out.println("=====================ADMIN MENU=======================");
 			System.out.println("1. View users");
 			System.out.println("2. Create user");
-			System.out.println("3. Update user");
+			System.out.println("3. Update user's password");
 			System.out.println("4. Delete user");
 			System.out.println("5. Logout");
 			
 			if (inputScan.nextInt() == 1) 
 			{
 				ViewUsers();
-				
+			}
+			else if (inputScan.nextInt() == 2) 
+			{
+				register();
+			}
+			else if (inputScan.nextInt() == 3) 
+			{
+				UpdateUserPassword();
+			}
+			else if (inputScan.nextInt() == 4) 
+			{
+				DeleteUser();		
+			}
+			else if (inputScan.nextInt() == 5) 
+			{
+				System.out.println("Logging off of superuser account");
+				break;
 			}
 			
-		}
+		}	
+	}
+
+
+	private static void UpdateUserPassword() {
 		
 		
 	}
 
 
-	private static void ViewUsers() {
+	private static void DeleteUser() 
+	{
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		UserService serv = UserService.getService();
+		
+		System.out.print("Enter username of user to delete: ");
+		
+		String username = inputScan.next();
+		
+		serv.deleteUser(username);
+		
+	}
+
+
+	private static void ViewUsers() 
+	{
 		UserService serv = UserService.getService();
 		List<User> users;
 		
@@ -548,11 +579,6 @@ public class App
 			
 		}
 		System.out.println();
-		
-		
-		
 	}
-
-	
 }
 

@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import com.JDBC.Exceptions.InsufficientFundsException;
 import com.JDBC.Exceptions.NegativeDepositException;
+import com.JDBC.Exceptions.NegativeWithdrawlException;
 import com.JDBC.dao.BankAccountDAO;
-import com.JDBC.dao.NegativeWithdrawlException;
 import com.JDBC.model.BankAccount;
 
 public class BankAccountService {
@@ -61,7 +61,5 @@ public class BankAccountService {
 	{
 		bankDAO.deleteBankAccount(accountId);
 	}
-	
-	
 	
 }

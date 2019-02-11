@@ -3,6 +3,10 @@ package com.JDBC.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Types;
@@ -11,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.JDBC.Exceptions.UsernameTakenException;
 import com.JDBC.model.User;
 import com.JDBC.util.ConnectionUtility;
 
@@ -18,6 +23,8 @@ import com.JDBC.util.ConnectionUtility;
 public class UserDAO implements IUserDAO
 {
 	private static UserDAO userDAO;
+	
+	private static final Logger log = LogManager.getLogger(UserDAO.class);
 	
 	private UserDAO () 
 	{
@@ -42,8 +49,7 @@ public class UserDAO implements IUserDAO
 		
 		if (con == null) 
 		{
-			return Optional.empty();
-			
+			return log.traceExit(Optional.empty());	
 		}
 		
 		try 
@@ -62,14 +68,24 @@ public class UserDAO implements IUserDAO
 			
 			User loginUser = new User(rs.getString("username"), rs.getLong("userid"));
 			
-			return Optional.of(loginUser);
+			return log.traceExit(Optional.of(loginUser));
 			
 		} catch(SQLException e) 
 		{
-			System.out.println("login: SQL exception");
+			log.catching(e);
+			log.error("A SQLException has occured.");
+			
+			try 
+			{
+				con.close();
+			}catch(SQLException e1) 
+			{
+				log.catching(e1);
+				log.error("An exception occured while attemping to close the connection object.");
+			}
 			
 		}
-		return Optional.empty();
+		return log.traceExit(Optional.empty());
 	}
 
 	@Override
@@ -77,8 +93,10 @@ public class UserDAO implements IUserDAO
 	{	
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null) {
-			return Optional.empty();
+		if (con == null) 
+		{
+			log.traceExit(Optional.empty());
+			return log.traceExit(Optional.empty());
 		}
 
 		try {
@@ -93,16 +111,19 @@ public class UserDAO implements IUserDAO
 				listOfUsers.add(new User( rs.getString("username"), rs.getLong(1)));
 			}
 			
-			return Optional.of(listOfUsers);
+			return log.traceExit(Optional.of(listOfUsers));
 		} catch (SQLException e) 
 		{
+			log.catching(e);
+			log.error("An SQLException has occured.");
 			try {
 				con.close();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				log.catching(e1);
+				log.error("An exception occured while attempting to close the connection object");
 			}
 		}
-		return null;
+		return log.traceExit(Optional.empty());
 	}
 
 	@Override
@@ -117,7 +138,6 @@ public class UserDAO implements IUserDAO
 		}
 		try 
 		{
-			
 			String query = "CALL userinsert(?, ?, ?)"; //Should return the generated user id...
 			
 			CallableStatement queryStmt = con.prepareCall(query);
@@ -138,14 +158,25 @@ public class UserDAO implements IUserDAO
 		{
 			if (e.getCause() instanceof SQLIntegrityConstraintViolationException) 
 			{
-				throw new UsernameTakenException("Username already taken!");
+				UsernameTakenException ute = new UsernameTakenException("Username already taken!");
+				log.catching(ute);
+				throw ute;
+				
 			}
 			else 
 			{
-				System.out.println("register: SQL exception");
+				log.catching(e);
+				log.error("An SQLException has occured.");
+				try {
+					con.close();
+				} catch (SQLException e1) {
+					log.catching(e1);
+					log.error("An exception occured while attempting to close the connection object");
+				}
+				log.traceExit(Optional.empty());
 			}
 		}
-		return Optional.empty();
+		return log.traceExit(Optional.empty());
 		
 	}
 
@@ -155,6 +186,7 @@ public class UserDAO implements IUserDAO
 		
 		if (con == null) 
 		{
+			log.traceExit();
 			return;	
 		}
 		try 
@@ -169,11 +201,20 @@ public class UserDAO implements IUserDAO
 			
 			queryStmt.execute();
 			
+			log.traceExit();
+			
 		} catch(SQLException e) 
 		{
-			System.out.println("updateUserPassword: SQL exception");
-			
+			log.catching(e);
+			log.error("An SQLException has occured");
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("An exception occured while attempting to close the connection object");
+			}
 		}
+		log.traceExit();
 	}
 
 	@Override
@@ -182,6 +223,7 @@ public class UserDAO implements IUserDAO
 		
 		if (con == null) 
 		{
+			log.traceExit();
 			return;	
 		}
 		try 
@@ -195,10 +237,21 @@ public class UserDAO implements IUserDAO
 			
 			queryStmt.execute();
 			
+			log.traceExit();
+			
+			
 		} catch(SQLException e)
 		{
-			System.out.println("deleteUser: SQL exception");
+			log.catching(e);
+			log.error("An SQLException has occured");
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("An exception occured while attempting to close the connection object");
+			}
 		}
+		log.traceExit();
 		
 	}
 }

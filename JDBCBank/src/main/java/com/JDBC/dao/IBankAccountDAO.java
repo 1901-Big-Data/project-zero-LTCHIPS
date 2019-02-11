@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.JDBC.Exceptions.InsufficientFundsException;
 import com.JDBC.Exceptions.NegativeDepositException;
+import com.JDBC.Exceptions.NegativeWithdrawlException;
 import com.JDBC.model.BankAccount;
 
 public interface IBankAccountDAO 

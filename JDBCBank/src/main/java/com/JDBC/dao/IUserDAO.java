@@ -3,6 +3,7 @@ package com.JDBC.dao;
 import java.util.List;
 import java.util.Optional;
 
+import com.JDBC.Exceptions.UsernameTakenException;
 import com.JDBC.model.User;
 
 public interface IUserDAO

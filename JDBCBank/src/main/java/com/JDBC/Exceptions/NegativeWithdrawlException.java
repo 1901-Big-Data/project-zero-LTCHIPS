@@ -1,4 +1,4 @@
-package com.JDBC.dao;
+package com.JDBC.Exceptions;
 
 public class NegativeWithdrawlException extends Throwable {
 

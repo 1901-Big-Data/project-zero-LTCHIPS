@@ -3,8 +3,8 @@ package com.JDBC.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.JDBC.Exceptions.UsernameTakenException;
 import com.JDBC.dao.UserDAO;
-import com.JDBC.dao.UsernameTakenException;
 import com.JDBC.model.User;
 
 public class UserService {

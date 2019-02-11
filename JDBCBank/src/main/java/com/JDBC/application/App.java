@@ -2,6 +2,7 @@ package com.JDBC.application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -10,13 +11,17 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.JDBC.Exceptions.ExistingFundsInAccountException;
 import com.JDBC.Exceptions.InsufficientFundsException;
 import com.JDBC.Exceptions.NegativeDepositException;
+import com.JDBC.Exceptions.NegativeWithdrawlException;
 import com.JDBC.Exceptions.NoUserAccountsToDeleteException;
 import com.JDBC.Exceptions.UserHasNoBankAccountException;
-import com.JDBC.dao.NegativeWithdrawlException;
-import com.JDBC.dao.UsernameTakenException;
+import com.JDBC.Exceptions.UsernameTakenException;
+import com.JDBC.dao.UserDAO;
 import com.JDBC.model.BankAccount;
 import com.JDBC.model.SuperUser;
 import com.JDBC.model.User;
@@ -28,9 +33,11 @@ import com.JDBC.util.ScannerSingleton;
 public class App 
 {
 	
+	
+	private static final Logger log = LogManager.getLogger(App.class);
+	
 	private static void printGreeting() 
 	{
-		
 		LocalDateTime now = LocalDateTime.now();
 		
 		System.out.println("Welcome to JDBC Banking!");
@@ -46,9 +53,7 @@ public class App
 	
 	private static SuperUser SuperLogin(String usernameArg, String passwordArg) throws IOException, FileNotFoundException
 	{
-		
 		InputStream in;
-		
 		
 		// load information from properties file
 		Properties props = new Properties();
@@ -470,7 +475,7 @@ public class App
 		
 	}
 	
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException
     {
     	Scanner scanner = ScannerSingleton.getScanner();
     	
@@ -537,7 +542,8 @@ public class App
     	}
     	catch(Exception e) 
     	{
-    		
+    		log.catching(e);
+    		log.error("An error occured while closing the input scanner");
     		
     	}
     	    	

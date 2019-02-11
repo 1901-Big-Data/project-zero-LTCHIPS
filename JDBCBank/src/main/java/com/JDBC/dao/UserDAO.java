@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Types;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -16,9 +17,7 @@ import com.JDBC.util.ConnectionUtility;
 
 public class UserDAO implements IUserDAO
 {
-	
 	private static UserDAO userDAO;
-	//todo: add logger (from log4j2)
 	
 	private UserDAO () 
 	{
@@ -72,17 +71,10 @@ public class UserDAO implements IUserDAO
 		}
 		return Optional.empty();
 	}
-	
-	@Override
-	public Optional<User> getUserByName(String userName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Optional<List<User>> getAllUsers() 
-	{
-		
+	{	
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {
@@ -102,15 +94,11 @@ public class UserDAO implements IUserDAO
 			}
 			
 			return Optional.of(listOfUsers);
-			//return log.traceExit(Optional.of(listOfChampions));
 		} catch (SQLException e) 
 		{
-			//log.catching(e);
-			//log.error("Sql Exception ovcured", e);
 			try {
 				con.close();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -118,7 +106,7 @@ public class UserDAO implements IUserDAO
 	}
 
 	@Override
-	public Optional<User> register(String username, String password)
+	public Optional<User> register(String username, String password) throws UsernameTakenException
 	{
 		Connection con = ConnectionUtility.getConnection();
 		
@@ -148,8 +136,14 @@ public class UserDAO implements IUserDAO
 			
 		} catch(SQLException e) 
 		{
-			System.out.println("register: SQL exception");
-			
+			if (e.getCause() instanceof SQLIntegrityConstraintViolationException) 
+			{
+				throw new UsernameTakenException("Username already taken!");
+			}
+			else 
+			{
+				System.out.println("register: SQL exception");
+			}
 		}
 		return Optional.empty();
 		
@@ -180,9 +174,6 @@ public class UserDAO implements IUserDAO
 			System.out.println("updateUserPassword: SQL exception");
 			
 		}
-		//return Optional.empty();
-		
-		
 	}
 
 	@Override
@@ -191,9 +182,7 @@ public class UserDAO implements IUserDAO
 		
 		if (con == null) 
 		{
-			//return Optional.empty();
-			return;
-			
+			return;	
 		}
 		try 
 		{
@@ -204,23 +193,12 @@ public class UserDAO implements IUserDAO
 			
 			queryStmt.setString(1,  userName);
 			
-			//queryStmt.setString(2,  password);
-			
-			//queryStmt.registerOutParameter(3, Types.NUMERIC);
-			
 			queryStmt.execute();
 			
-			//long userid = queryStmt.getLong(3);
-			
-			//return Optional.of(new User(username, userid));
-			
-		} catch(SQLException e) 
+		} catch(SQLException e)
 		{
 			System.out.println("deleteUser: SQL exception");
-			
 		}
-		//return Optional.empty();
 		
 	}
-
 }

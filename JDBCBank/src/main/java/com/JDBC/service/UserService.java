@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.JDBC.dao.UserDAO;
+import com.JDBC.dao.UsernameTakenException;
 import com.JDBC.model.User;
 
 public class UserService {
@@ -14,7 +15,6 @@ public class UserService {
 	
 	private UserService()
 	{
-		//constructor stuff
 		
 		
 	}
@@ -36,7 +36,7 @@ public class UserService {
 		
 	}
 	
-	public Optional<User> register(String username, String password)
+	public Optional<User> register(String username, String password) throws UsernameTakenException
 	{
 		return userDAO.register(username, password);
 		
@@ -45,12 +45,6 @@ public class UserService {
 	public Optional<List<User>> getUsers()
 	{
 		return userDAO.getAllUsers();
-		
-	}
-	
-	public Optional<User> getUserByName(String name)
-	{
-		return userDAO.getUserByName(name);
 		
 	}
 	

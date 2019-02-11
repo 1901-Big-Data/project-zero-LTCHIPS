@@ -23,13 +23,11 @@ public class ConnectionUtility
 		InputStream in = null;
 
 		try {
-			// load information from properties file
 			Properties props = new Properties();
 			in = new FileInputStream(
 					"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\connection.properties");
 			props.load(in);
 
-			// get the connection object
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection con = null;
 
@@ -40,7 +38,7 @@ public class ConnectionUtility
 			con = DriverManager.getConnection(endpoint, username, password);
 			ConnectionUtility.connectionInstance = con;
 			return connectionInstance;
-		}  catch (IOException ioe) 
+		} catch (IOException ioe) 
 		{
 			System.out.println("There was a problem reading the config file for database connection.");
 			

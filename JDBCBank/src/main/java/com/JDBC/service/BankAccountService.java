@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.JDBC.Exceptions.InsufficientFundsException;
+import com.JDBC.Exceptions.NegativeDepositException;
 import com.JDBC.dao.BankAccountDAO;
-
+import com.JDBC.dao.NegativeWithdrawlException;
 import com.JDBC.model.BankAccount;
 
 public class BankAccountService {
@@ -46,22 +47,19 @@ public class BankAccountService {
 		return bankDAO.addBankAccount(bankAccountName, userid);
 	}
 	
-	public void depositIntoBankAccount(double amount, long accountid) 
+	public void depositIntoBankAccount(double amount, long accountid) throws NegativeDepositException 
 	{
 		bankDAO.depositIntoBankAccount(amount, accountid);
-		
 	}
 	
-	public void withdrawFromBankAccount(double amount, long accountid) throws InsufficientFundsException 
+	public void withdrawFromBankAccount(double amount, long accountid) throws InsufficientFundsException, NegativeWithdrawlException 
 	{
 		bankDAO.withdrawlFunds(amount, accountid);
-		
 	}
 	
 	public void deleteBankAccount(long accountId) 
 	{
 		bankDAO.deleteBankAccount(accountId);
-		
 	}
 	
 	

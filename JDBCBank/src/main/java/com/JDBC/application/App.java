@@ -1,6 +1,7 @@
 package com.JDBC.application;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -9,7 +10,13 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Scanner;
 
+import com.JDBC.Exceptions.ExistingFundsInAccountException;
 import com.JDBC.Exceptions.InsufficientFundsException;
+import com.JDBC.Exceptions.NegativeDepositException;
+import com.JDBC.Exceptions.NoUserAccountsToDeleteException;
+import com.JDBC.Exceptions.UserHasNoBankAccountException;
+import com.JDBC.dao.NegativeWithdrawlException;
+import com.JDBC.dao.UsernameTakenException;
 import com.JDBC.model.BankAccount;
 import com.JDBC.model.SuperUser;
 import com.JDBC.model.User;
@@ -21,7 +28,7 @@ import com.JDBC.util.ScannerSingleton;
 public class App 
 {
 	
-	public static void printGreeting() 
+	private static void printGreeting() 
 	{
 		
 		LocalDateTime now = LocalDateTime.now();
@@ -37,43 +44,37 @@ public class App
 	}
 	
 	
-	public static SuperUser SuperLogin(String usernameArg, String passwordArg) 
+	private static SuperUser SuperLogin(String usernameArg, String passwordArg) throws IOException, FileNotFoundException
 	{
 		
 		InputStream in;
 		
-		try {
-			// load information from properties file
-			Properties props = new Properties();
-			in = new FileInputStream(
-					"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\admin.properties");
-			props.load(in);
+		
+		// load information from properties file
+		Properties props = new Properties();
+		in = new FileInputStream(
+				"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\admin.properties");
+		props.load(in);
 			
-			String username = props.getProperty("jdbc.admin.username");
-			String password = props.getProperty("jdbc.admin.password");
+		String username = props.getProperty("jdbc.admin.username");
+		String password = props.getProperty("jdbc.admin.password");
 			
-			if (usernameArg.equals(username)) 
-			{
-				if(passwordArg.equals(password)) 
-				{
-					return new SuperUser(username, (long)1234);
-				}
-			}
-			else 
-			{
-				return null;
-			}
-
-		}  catch (IOException ioe) 
+		if (usernameArg.equals(username)) 
 		{
-			//System.out.println("There was a problem reading the config file for database connection.");
+			if(passwordArg.equals(password)) 
+			{
+				return new SuperUser(username, (long)1234);
+			}
+		}
+		else 
+		{
 			return null;
 		}
 		return null;
 		
 		
 	}
-	public static User LoopLogin()
+	private static User LoopLogin()
 	{		
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
@@ -101,23 +102,33 @@ public class App
 			System.out.println("Username or password incorrect.");
 			return null;
 		}
+		catch(IOException ioe) 
+		{
+			try {
+				returnUser = userService.login(userNameIn, passwordIn).get();
+			}
+			catch(NoSuchElementException nsee)
+			{
+				System.out.println("Username or password incorrect.");
+				return null;
+			}
+		}
 		
 		return returnUser;
 		
 	}
 	
-	public static void PrintBankAccounts(User curUser) 
+	private static void PrintBankAccounts(User curUser) 
 	{
 		
 		BankAccountService bankService = BankAccountService.getService();
-		List<BankAccount> userBankAccounts = bankService .getAllUsersBankAccounts(curUser.getUserID()).get();
+		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
 		
 		if (userBankAccounts.isEmpty()) 
 		{
 			System.out.println("User currently has no bank accounts");
 			
 		}
-		
 		
 		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
@@ -136,7 +147,7 @@ public class App
 		
 	}
 	
-	public static void dashboard(User curUser) 
+	private static void dashboard(User curUser) 
 	{
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
@@ -155,7 +166,7 @@ public class App
 			
 			if (inputScan.nextInt() == 1) 
 			{
-				CreateAccount(curUser);	
+				CreateAccount(curUser);
 			}
 			else if (inputScan.nextInt() == 2) 
 			{
@@ -163,15 +174,46 @@ public class App
 			}
 			else if (inputScan.nextInt() == 3) 
 			{
-				DeleteAccount(curUser);	
+				try {
+					DeleteAccount(curUser);
+				}
+				catch(NoUserAccountsToDeleteException nuatde) 
+				{
+					System.out.println(nuatde.getMessage());
+				}
+				catch(ExistingFundsInAccountException efinae) 
+				{
+					System.out.println(efinae.getMessage());
+				}
 			}
 			else if (inputScan.nextInt() == 4) 
 			{
-				DepositIntoAccount(curUser);
+				try {
+					DepositIntoAccount(curUser);
+				}
+				catch(NegativeDepositException nde) 
+				{
+					System.out.println(nde.getMessage());
+				}
+				catch(UserHasNoBankAccountException uhnae) 
+				{
+					System.out.println(uhnae.getMessage());
+				}
+				
 			}
 			else if (inputScan.nextInt() == 5) 
 			{
-				WithdrawFromAccount(curUser);
+				try {
+					WithdrawFromAccount(curUser);
+				}
+				catch(InsufficientFundsException ife) 
+				{
+					System.out.println(ife.getMessage());
+				}
+				catch(NegativeWithdrawlException nwe) 
+				{
+					System.out.println(nwe.getMessage());
+				}
 			}
 			else if (inputScan.nextInt() == 6) 
 			{
@@ -183,7 +225,7 @@ public class App
 		
 	}
 	
-	private static void WithdrawFromAccount(User curUser) {
+	private static void WithdrawFromAccount(User curUser) throws InsufficientFundsException, NegativeWithdrawlException {
 		BankAccountService bankService = BankAccountService.getService();
 		
 		Scanner inputScan = ScannerSingleton.getScanner();
@@ -197,8 +239,6 @@ public class App
 		{
 			PrintBankAccounts(curUser, userBankAccounts);
 			System.out.println();
-			
-			
 			int chosenAccount = 0;
 			
 			while(true) 
@@ -224,19 +264,22 @@ public class App
 			bankAccount = userBankAccounts.get(0);
 		}
 		
+		
+		
 		System.out.print("Enter amount to Withdraw: ");
 		
 		double amountToWithdraw = inputScan.nextDouble();
 		
-		try {
-			bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID());
-		} catch (InsufficientFundsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (bankAccount.getBalance() < amountToWithdraw) 
+		{
+			throw new InsufficientFundsException("Insufficient Funds");
 		}
+		
+		bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID()); 
+		
 	}
 
-	public static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
+	private static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
 	{
 		if (userBankAccounts.isEmpty()) 
 		{
@@ -247,11 +290,11 @@ public class App
 		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
 		{
-			System.out.print((x + 1) + ":");
+			System.out.print((x + 1) + ": ");
 			
 			System.out.print("Name: ");
-			System.out.print(userBankAccounts.get(x).getName());
-			System.out.print("\t \t");
+			System.out.print(userBankAccounts.get(x).getName() + "\t");
+			//System.out.print("\t");
 			
 			System.out.print("Funds: $");
 			System.out.print(userBankAccounts.get(x).getBalance());
@@ -261,13 +304,13 @@ public class App
 		
 	}
 
-	public static void DepositIntoAccount(User curUser) {
+	private static void DepositIntoAccount(User curUser) throws NegativeDepositException, UserHasNoBankAccountException {
 		BankAccountService bankService = BankAccountService.getService();
 		
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
 		
-		List<BankAccount> userBankAccounts = bankService .getAllUsersBankAccounts(curUser.getUserID()).get();
+		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
 		
 		long bankid;
 		
@@ -297,20 +340,27 @@ public class App
 			bankid = userBankAccounts.get(chosenAccount - 1).getAccountID();
 			
 		}
+		else if (userBankAccounts.size() == 0) 
+		{
+			throw new UserHasNoBankAccountException("User does not have any bank accounts!");
+			
+		}
+		
 		else 
 		{
 			bankid = userBankAccounts.get(0).getAccountID();
 		}
+		
+		
 		
 		System.out.print("Specify how much you wish to deposit: ");
 		Double amountToDeposit = inputScan.nextDouble();
 		
 		bankService.depositIntoBankAccount(amountToDeposit, bankid);
 		
-		
 	}
 
-	public static void DeleteAccount(User curUser) {
+	private static void DeleteAccount(User curUser) throws NoUserAccountsToDeleteException, ExistingFundsInAccountException {
 		
 		BankAccountService bankService = BankAccountService.getService();
 		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
@@ -319,7 +369,7 @@ public class App
 		
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
-		if (userBankAccounts.size() > 1) 
+		if (userBankAccounts.size() > 0) 
 		{
 			PrintBankAccounts(curUser, userBankAccounts);
 			System.out.println();
@@ -347,20 +397,20 @@ public class App
 		}
 		else 
 		{
-			bankAccount = userBankAccounts.get(0);
+			throw new NoUserAccountsToDeleteException("There are no user accounts to delete.");
+			
 		}
 		
 		if (bankAccount.getBalance() > 0.0) 
 		{
-			throw new RuntimeException("Cannot delete account that still has funds inside!");
-			
+			throw new ExistingFundsInAccountException("Cannot delete account that still has funds inside!");
 		}
 		
 		bankService.deleteBankAccount(bankAccount.getAccountID());
 		
 	}
 
-	public static void CreateAccount(User curUser) 
+	private static void CreateAccount(User curUser) 
 	{
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
@@ -374,7 +424,7 @@ public class App
 		bankService.addBankAccount(newBankAccountName, curUser.getUserID());
 	}
 
-	public static User register() 
+	private static User register() throws UsernameTakenException 
 	{
 		Scanner inputScan = ScannerSingleton.getScanner();
 		
@@ -403,19 +453,9 @@ public class App
 				passwordCheck = inputScan.next();
 				
 			}			
-			
-			//TODO: COME UP WITH AN EXCEPTION TO THROW IF USERNAME ALREADY EXISTS
 
-			//try 
-			//{
-				newUser = userService.register(userNameIn, passwordIn).get();
+			newUser = userService.register(userNameIn, passwordIn).get();
 				
-			//}
-			//finally
-			//{
-				//inputScan.close();
-				
-			//}
 			
 			if (newUser != null) 
 			{
@@ -465,7 +505,15 @@ public class App
     		}
     		else if (scanner.nextInt() == 2) 
     		{
-    			register();
+    			try 
+				{
+					register();
+					
+				}catch(UsernameTakenException ute) 
+				{
+					System.out.println(ute.getMessage());
+					
+				}
     			
     		}
     		else if (scanner.nextInt() == 3) 
@@ -514,7 +562,16 @@ public class App
 			}
 			else if (inputScan.nextInt() == 2) 
 			{
-				register();
+				try 
+				{
+					register();
+					
+				}catch(UsernameTakenException ute) 
+				{
+					System.out.println(ute.getMessage());
+					
+				}
+				
 			}
 			else if (inputScan.nextInt() == 3) 
 			{
@@ -557,7 +614,6 @@ public class App
 			serv.updateUserPassword(username, pwordSecondAttmpt);
 			
 		}
-		
 		
 	}
 

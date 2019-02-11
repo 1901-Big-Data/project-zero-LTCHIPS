@@ -10,19 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.JDBC.Exceptions.InsufficientFundsException;
+import com.JDBC.Exceptions.NegativeDepositException;
 import com.JDBC.model.BankAccount;
-import com.JDBC.model.User;
 import com.JDBC.util.ConnectionUtility;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 
 public class BankAccountDAO implements IBankAccountDAO {
 
 	private static BankAccountDAO dao;
 	
+	private static final Logger log = LogManager.getLogger(BankAccountDAO.class);
+	
 	private BankAccountDAO() 
-	{
-		
-		
+	{		
 		
 	}
 	
@@ -43,6 +47,7 @@ public class BankAccountDAO implements IBankAccountDAO {
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {
+			log.traceExit(Optional.empty());
 			return Optional.empty();
 		}
 
@@ -59,26 +64,28 @@ public class BankAccountDAO implements IBankAccountDAO {
 			}
 			
 			return Optional.of(listOfBankAccounts);
-			//return log.traceExit(Optional.of(listOfChampions));
 		} catch (SQLException e) 
 		{
-			//log.catching(e);
-			//log.error("Sql Exception ovcured", e);
+			log.catching(e);
+			log.error("An SQLException occured.", e);
 			try {
 				con.close();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				log.catching(e1);
+				log.error("An SQLException occured.", e1);
 			}
 		}
-		return null;
+		log.traceExit(Optional.empty());
+		return Optional.empty();
 	}
 
 	@Override
 	public Optional<List<BankAccount>> getAllUsersBankAccount(long userId) {
+		log.traceEntry();
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {
+			log.traceExit(Optional.empty());
 			return Optional.empty();
 		}
 
@@ -97,43 +104,44 @@ public class BankAccountDAO implements IBankAccountDAO {
 				listOfBankAccounts.add(new BankAccount( rs.getLong(1), rs.getLong(4), rs.getString(2)));
 			}
 			
-			return Optional.of(listOfBankAccounts);
-			//return log.traceExit(Optional.of(listOfChampions));
+			return log.traceExit(Optional.of(listOfBankAccounts));
 		} catch (SQLException e) 
 		{
-			//log.catching(e);
-			//log.error("Sql Exception ovcured", e);
+			log.catching(e);
+			log.error("An SQLException has occured." , e);
 			try {
 				con.close();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
 			}
 		}
-		return null;
+		log.traceExit(Optional.empty());
+		return Optional.empty();
 		
 	}
 
 	@Override
-	public void depositIntoBankAccount(double amount, long accountid) 
+	public void depositIntoBankAccount(double amount, long accountid) throws NegativeDepositException 
 	{
 		if (amount < 0.0) 
 		{
-			throw new IllegalArgumentException("Cannot deposit negative amounts into account!");
+			NegativeDepositException nde = new NegativeDepositException("Cannot deposit negative amounts into account!");
+			log.catching(nde);
+			log.error(nde.getMessage(), nde);
+			throw nde;
 		}
 		
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null)
+		if (con == null) {
+			log.traceExit();
 			return;
-		//{
-			//return Optional.empty();
-			
-		//}
+		}
 		try 
 		{
 			
-			String query = "CALL deposit(?, ?)"; //Should return the generated bankaccount id...
+			String query = "CALL deposit(?, ?)";
 			
 			CallableStatement queryStmt = con.prepareCall(query);
 			
@@ -141,45 +149,47 @@ public class BankAccountDAO implements IBankAccountDAO {
 			
 			queryStmt.setLong(1,accountid);
 			
-			//queryStmt.registerOutParameter(3, Types.NUMERIC);
-			
 			queryStmt.execute();
 			
-			//long bankAccountId = queryStmt.getLong(3);
+			log.traceExit();
 			
-			//return Optional.of(new BankAccount(bankAccountId, 0, bankAccountName));
-			
-		} catch(SQLException e) 
+		} catch(SQLException e)
 		{
-			System.out.println("depositIntoBankAccount: SQL exception");
+			log.catching(e);
+			log.error("An SQLException has occured.", e);
+			
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
+			}
 			
 		}
-		//return Optional.empty();
-		
-		
-		
+		log.traceExit();
 	}
 
 	@Override
-	public void withdrawlFunds(double amountToWithdrawl, long accountid) {
+	public void withdrawlFunds(double amountToWithdrawl, long accountid) throws NegativeWithdrawlException {
 		
 		if (amountToWithdrawl < 0.0) 
 		{
-			throw new IllegalArgumentException("Cannot withdraw negative amounts from account!");
+			NegativeWithdrawlException nwe = new NegativeWithdrawlException("Cannot withdraw negative amounts from account!");
+			log.catching(nwe);
+			log.error(nwe.getMessage(), nwe);
+			throw nwe;
 		}
 		
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null)
+		if (con == null) {
+			log.traceExit();
 			return;
-		//{
-			//return Optional.empty();
-			
-		//}
+		}
 		try
 		{
 			
-			String query = "CALL withdraw(?, ?)"; //Should return the generated bankaccount id...
+			String query = "CALL withdraw(?, ?)";
 			
 			CallableStatement queryStmt = con.prepareCall(query);
 			
@@ -187,22 +197,23 @@ public class BankAccountDAO implements IBankAccountDAO {
 			
 			queryStmt.setLong(1,accountid);
 			
-			//queryStmt.registerOutParameter(3, Types.NUMERIC);
-			
 			queryStmt.execute();
 			
-			//long bankAccountId = queryStmt.getLong(3);
-			
-			//return Optional.of(new BankAccount(bankAccountId, 0, bankAccountName));
-			
-		} catch(SQLException e) 
+		} catch(SQLException e)
 		{
-			System.out.println("withdrawlFunds: SQL exception");
+			log.catching(e);
+			log.error("An SQLException has occured.", e);
+			
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
+			}
 			
 		}
-		//return Optional.empty();
 		
-		
+		log.traceExit();
 		
 	}
 
@@ -210,15 +221,14 @@ public class BankAccountDAO implements IBankAccountDAO {
 	public Optional<BankAccount> addBankAccount(String bankAccountName, long userid) {
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null) 
-		{
+		if (con == null) {
+			log.traceExit();
 			return Optional.empty();
-			
 		}
 		try 
 		{
 			
-			String query = "CALL bankinsert(?, ?, ?)"; //Should return the generated bankaccount id...
+			String query = "CALL bankinsert(?, ?, ?)";
 			
 			CallableStatement queryStmt = con.prepareCall(query);
 			
@@ -232,20 +242,23 @@ public class BankAccountDAO implements IBankAccountDAO {
 			
 			long bankAccountId = queryStmt.getLong(3);
 			
-			return Optional.of(new BankAccount(bankAccountId, 0, bankAccountName));
+			return log.traceExit(Optional.of(new BankAccount(bankAccountId, 0, bankAccountName)));
 			
-		} catch(SQLException e) 
+		} catch(SQLException e)
 		{
-			System.out.println("addBankAccount: SQL exception");
+			log.catching(e);
+			log.error("An SQLException has occured.", e);
+			
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
+			}
 			
 		}
+		log.traceExit(Optional.empty());
 		return Optional.empty();
-		
-	}
-
-	@Override
-	public void updateBankAccount(BankAccount accnt, String[] params) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -254,35 +267,36 @@ public class BankAccountDAO implements IBankAccountDAO {
 	{
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null)
+		if (con == null) {
+			log.traceExit();
 			return;
+		}
 		try
 		{
 			
-			String query = "CALL removeAccount(?)"; //Should return the generated bankaccount id...
+			String query = "CALL removeAccount(?)";
 			
 			CallableStatement queryStmt = con.prepareCall(query);
 			
 			queryStmt.setLong(1, accountId);
 			
-			//queryStmt.registerOutParameter(3, Types.NUMERIC);
-			
 			queryStmt.execute();
 			
-			//long bankAccountId = queryStmt.getLong(3);
-			
-			//return Optional.of(new BankAccount(bankAccountId, 0, bankAccountName));
-			
-		} catch(SQLException e) 
+			log.traceExit();
+						
+		} 
+		catch(SQLException e)
 		{
-			System.out.println("deleteBankAccount: SQL exception");
+			log.catching(e);
+			log.error("An SQLException has occured.", e);
 			
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
+			}	
 		}
-		//return Optional.empty();
-		
-		
-		
+		log.traceExit();
 	}
-	
-	
 }

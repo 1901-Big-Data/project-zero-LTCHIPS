@@ -28,7 +28,6 @@ public class BankAccount
 	public String getName() 
 	{
 		return name;
-		
 	}
 	
 	public boolean isBalanceEmpty() 

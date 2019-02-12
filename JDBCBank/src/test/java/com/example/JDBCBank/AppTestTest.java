@@ -36,6 +36,8 @@ public class AppTestTest {
 	public static void setUpBeforeClass() throws Exception 
 	{
 		
+		tearDownAfterClass();
+		
         UserService userServ = UserService.getService();
         
         BankAccountService bankServ = BankAccountService.getService();
@@ -58,17 +60,16 @@ public class AppTestTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		UserService userServ = UserService.getService();
 		
 		Connection con = ConnectionUtility.getConnection();
 		
 		try 
 		{
-			PreparedStatement ps = con.prepareStatement("DELETE FROM bankaccount WHERE accountname = 'testdeletebankaccount' or accountname = 'testbankdeposit' or accountname = 'testbankwithdrawl'");
+			PreparedStatement ps = con.prepareStatement("DELETE FROM bankaccount WHERE accountname = 'testdeletebankaccount' or accountname = 'testbankdeposit' or accountname = 'testbankwithdrawl' or accountname = 'deleteBankAccount'");
 			
 			ps.execute();
 			
-			PreparedStatement ps2 = con.prepareStatement("DELETE FROM users WHERE username = 'test' or username = 'deleteme'");
+			PreparedStatement ps2 = con.prepareStatement("DELETE FROM users WHERE username = 'test' or username = 'deleteme' or username = 'newguy' or username = 'registerTest'");
 				
 			ps2.execute();
 			
@@ -99,7 +100,12 @@ public class AppTestTest {
 		BankAccountService bankServ = BankAccountService.getService();
 		
 		bankServ.withdrawFromBankAccount(100.0, withdrawlAccntId);
-		assertEquals(455.0, Math.round(bankServ.getBankAccount(withdrawlAccntId).get().getBalance()), 0.00001);
+		
+		BankAccount bankAccnt = bankServ.getBankAccount("testbankwithdrawl").get();
+		
+		double newAmount = bankAccnt.getBalance();
+		
+		assertEquals(455.0, newAmount, 0.00001);
 		
 	}
 

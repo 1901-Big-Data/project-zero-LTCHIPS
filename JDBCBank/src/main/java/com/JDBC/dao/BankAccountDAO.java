@@ -68,12 +68,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 		{
 			log.catching(e);
 			log.error("An SQLException occured.", e);
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("An SQLException occured.", e1);
-			}
 		}
 		log.traceExit(Optional.empty());
 		return Optional.empty();
@@ -109,12 +103,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 		{
 			log.catching(e);
 			log.error("An SQLException has occured." , e);
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}
 		}
 		log.traceExit(Optional.empty());
 		return Optional.empty();
@@ -137,19 +125,50 @@ public class BankAccountDAO implements IBankAccountDAO {
 			
 			ps.setLong(1, bankAccountId);
 			
+			ps.executeQuery();
+			
 			ResultSet rs = ps.executeQuery();
+			
+			rs.next();
 			
 			return log.traceExit(Optional.of(new BankAccount(rs.getLong(1), rs.getLong(4), rs.getString(2))));
 		} catch (SQLException e) 
 		{
 			log.catching(e);
 			log.error("An SQLException has occured." , e);
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}
+		}
+		log.traceExit(Optional.empty());
+		return Optional.empty();
+		
+	}
+	
+	@Override
+	public Optional<BankAccount> getBankAccount(String bankAccountName) {
+		log.traceEntry();
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) {
+			log.traceExit(Optional.empty());
+			return Optional.empty();
+		}
+
+		try {
+			String sql = "select * from bankaccount where accountname = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			
+			ps.setString(1, bankAccountName);
+			
+			ps.executeQuery();
+			
+			ResultSet rs = ps.executeQuery();
+			
+			rs.next();
+			
+			return log.traceExit(Optional.of(new BankAccount(rs.getLong(1), rs.getLong(4), rs.getString(2))));
+		} catch (SQLException e) 
+		{
+			log.catching(e);
+			log.error("An SQLException has occured." , e);
 		}
 		log.traceExit(Optional.empty());
 		return Optional.empty();
@@ -194,13 +213,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 			log.catching(e);
 			log.error("An SQLException has occured.", e);
 			
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}
-			
 		}
 		log.traceExit();
 	}
@@ -240,13 +252,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 			log.catching(e);
 			log.error("An SQLException has occured.", e);
 			
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}
-			
 		}
 		
 		log.traceExit();
@@ -285,13 +290,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 			log.catching(e);
 			log.error("An SQLException has occured.", e);
 			
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}
-			
 		}
 		log.traceExit(Optional.empty());
 		return Optional.empty();
@@ -325,13 +323,6 @@ public class BankAccountDAO implements IBankAccountDAO {
 		{
 			log.catching(e);
 			log.error("An SQLException has occured.", e);
-			
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("There was a problem in attempting to close the connection for the database.", e1);
-			}	
 		}
 		log.traceExit();
 	}

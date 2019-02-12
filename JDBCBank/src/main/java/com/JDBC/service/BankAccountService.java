@@ -42,6 +42,11 @@ public class BankAccountService {
 		return bankDAO.getAllUsersBankAccount(userid);
 	}
 	
+	public Optional<BankAccount> getBankAccount(long accountId)
+	{
+		return bankDAO.getBankAccount(accountId);
+	}
+	
 	public Optional<BankAccount> addBankAccount(String bankAccountName, long userid)
 	{
 		return bankDAO.addBankAccount(bankAccountName, userid);

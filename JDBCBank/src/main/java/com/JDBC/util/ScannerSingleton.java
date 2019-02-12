@@ -27,6 +27,7 @@ public class ScannerSingleton {
 		else 
 		{
 			scannerThing.close();
+			scannerThing = null;
 		}
 	}
 	

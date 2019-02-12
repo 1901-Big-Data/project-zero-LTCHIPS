@@ -1,4 +1,3 @@
-
 Configuration:
   name: Default
 
@@ -21,16 +20,24 @@ Configuration:
       fileName: ${log_path}/logfile.log
       PatternLayout:
         pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
-        
+
   Loggers:
-  
-    Root:
+    logger:
+      name: com.JDBC.util.ConnectionUtility
       level: trace
       AppenderRef:
-        - ref: Console_Appender
         - ref: File_Appender
-        
-    com.example.util.ConnectionUtil:
+    
+      name: com.JDBC.dao.UserDAO
+      level: trace
+      AppenderRef:
+        - ref: File_Appender
+    
+      name: com.JDBC.dao.BankAccountDAO
+      level: trace
+      AppenderRef:
+        - ref: File_Appender
+    Root:
       level: trace
       AppenderRef:
         - ref: File_Appender

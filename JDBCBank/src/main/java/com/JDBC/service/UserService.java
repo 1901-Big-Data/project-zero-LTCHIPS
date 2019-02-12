@@ -3,6 +3,7 @@ package com.JDBC.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.JDBC.Exceptions.IncorrectLoginException;
 import com.JDBC.Exceptions.UsernameTakenException;
 import com.JDBC.dao.UserDAO;
 import com.JDBC.model.User;
@@ -48,15 +49,26 @@ public class UserService {
 		
 	}
 	
+	public Optional<User> getUser(long userid)
+	{
+		return userDAO.getUser(userid);
+	}
+	
 	public void updateUserPassword(String username, String newPassword) 
 	{
 		userDAO.updateUserPassword(username, newPassword);
 		
 	}
 	
-	public void deleteUser(String username) 
+	public void updateUserName(String oldUserName, String newUserName) 
 	{
-		userDAO.deleteUser(username);
+		userDAO.updateUserName(oldUserName, newUserName);
+		
+	}
+	
+	public long deleteUser(String username) 
+	{
+		return userDAO.deleteUser(username);
 	}
 	
 	

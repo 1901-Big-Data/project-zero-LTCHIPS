@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JDBC.Exceptions.ExistingFundsInAccountException;
+import com.JDBC.Exceptions.IncorrectLoginException;
 import com.JDBC.Exceptions.InsufficientFundsException;
 import com.JDBC.Exceptions.NegativeDepositException;
 import com.JDBC.Exceptions.NegativeWithdrawlException;
@@ -33,8 +35,7 @@ import com.JDBC.util.ScannerSingleton;
 public class App 
 {
 	
-	
-	private static final Logger log = LogManager.getLogger(App.class);
+	private static final Logger log = LogManager.getLogger();
 	
 	private static void printGreeting() 
 	{
@@ -58,7 +59,7 @@ public class App
 		// load information from properties file
 		Properties props = new Properties();
 		in = new FileInputStream(
-				"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\admin.properties");
+				"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBC\\Resources\\admin.properties");
 		props.load(in);
 			
 		String username = props.getProperty("jdbc.admin.username");
@@ -168,64 +169,68 @@ public class App
 			System.out.println("6. Logout");
 			
 			System.out.print(">");
-			
-			if (inputScan.nextInt() == 1) 
-			{
-				CreateAccount(curUser);
-			}
-			else if (inputScan.nextInt() == 2) 
-			{
-				PrintBankAccounts(curUser);
-			}
-			else if (inputScan.nextInt() == 3) 
-			{
-				try {
-					DeleteAccount(curUser);
-				}
-				catch(NoUserAccountsToDeleteException nuatde) 
+			try {
+				if (inputScan.nextInt() == 1) 
 				{
-					System.out.println(nuatde.getMessage());
+					CreateAccount(curUser);
 				}
-				catch(ExistingFundsInAccountException efinae) 
+				else if (inputScan.nextInt() == 2) 
 				{
-					System.out.println(efinae.getMessage());
+					PrintBankAccounts(curUser);
 				}
-			}
-			else if (inputScan.nextInt() == 4) 
-			{
-				try {
-					DepositIntoAccount(curUser);
-				}
-				catch(NegativeDepositException nde) 
+				else if (inputScan.nextInt() == 3) 
 				{
-					System.out.println(nde.getMessage());
+					try {
+						DeleteAccount(curUser);
+					}
+					catch(NoUserAccountsToDeleteException nuatde) 
+					{
+						System.out.println(nuatde.getMessage());
+					}
+					catch(ExistingFundsInAccountException efinae) 
+					{
+						System.out.println(efinae.getMessage());
+					}
 				}
-				catch(UserHasNoBankAccountException uhnae) 
+				else if (inputScan.nextInt() == 4) 
 				{
-					System.out.println(uhnae.getMessage());
-				}
+					try {
+						DepositIntoAccount(curUser);
+					}
+					catch(NegativeDepositException nde) 
+					{
+						System.out.println(nde.getMessage());
+					}
+					catch(UserHasNoBankAccountException uhnae) 
+					{
+						System.out.println(uhnae.getMessage());
+					}
 				
-			}
-			else if (inputScan.nextInt() == 5) 
-			{
-				try {
-					WithdrawFromAccount(curUser);
 				}
-				catch(InsufficientFundsException ife) 
+				else if (inputScan.nextInt() == 5) 
 				{
-					System.out.println(ife.getMessage());
+					try {
+						WithdrawFromAccount(curUser);
+					}
+					catch(InsufficientFundsException ife) 
+					{
+						System.out.println(ife.getMessage());
+					}
+					catch(NegativeWithdrawlException nwe) 
+					{
+						System.out.println(nwe.getMessage());
+					}
 				}
-				catch(NegativeWithdrawlException nwe) 
+				else if (inputScan.nextInt() == 6) 
 				{
-					System.out.println(nwe.getMessage());
+					System.out.println("Logging off, have a nice day!");
+					break;
 				}
 			}
-			else if (inputScan.nextInt() == 6) 
+			catch(InputMismatchException ime) 
 			{
-				System.out.println("Logging off, have a nice day!");
-				break;
+				System.out.println("Invalid choice");
 			}
-			
 		}
 		
 	}
@@ -475,9 +480,9 @@ public class App
 		
 	}
 	
-    public static void main( String[] args ) throws IOException
+    public static void main( String[] args ) throws Exception
     {
-    	Scanner scanner = ScannerSingleton.getScanner();
+    	Scanner scanner = ScannerSingleton.getScanner();    	
     	
     	printGreeting();
     	
@@ -491,47 +496,62 @@ public class App
     		
     		System.out.print(">");
     		
-    		if (scanner.nextInt() == 1) 
-    		{
-    			User curUser = null;
-    			
-    			curUser = LoopLogin();
-    			
-    			if (curUser instanceof SuperUser) 
+    		
+    		try {
+    			if (scanner.nextInt() == 1) 
     			{
-    				adminDashboard();
-    			}
+    				User curUser = null;
     			
-    			else if (curUser instanceof User && curUser != null) 
-    			{
-    				 dashboard(curUser);
+    				curUser = LoopLogin();
+    			
+    				if (curUser instanceof SuperUser) 
+    				{
+    					adminDashboard();
+    				}
+    			
+    				else if (curUser instanceof User && curUser != null) 
+    				{
+    					dashboard(curUser);
     				 
+    				}
     			}
-    		}
-    		else if (scanner.nextInt() == 2) 
-    		{
-    			try 
-				{
-					register();
+    			else if (scanner.nextInt() == 2) 
+    			{
+    				try 
+    				{
+    					register();
 					
-				}catch(UsernameTakenException ute) 
+    				}catch(UsernameTakenException ute) 
+    				{
+    					System.out.println(ute.getMessage());
+					
+    				}
+    			
+    			}
+    			else if (scanner.nextInt() == 3) 
+    			{
+    				System.out.println("Exiting Application...");
+    				break;
+    			
+    			}
+    			else
+    			{
+    				System.out.println("Invalid Command");
+    			}    
+    		}
+    		catch(InputMismatchException ime) 
+			{
+				System.out.println("Invalid choice");
+				try {
+					ScannerSingleton.killScanner();
+				}catch(Exception e) 
 				{
-					System.out.println(ute.getMessage());
+					break;
 					
 				}
-    			
-    		}
-    		else if (scanner.nextInt() == 3) 
-    		{
-    			System.out.println("Exiting Application...");
-    			
-    			break;
-    			
-    		}
-    		else
-    		{
-    			System.out.println("Invalid Command");
-    		}    		
+				
+				
+			}
     		
     	}
     	
@@ -559,40 +579,61 @@ public class App
 			System.out.println("1. View users");
 			System.out.println("2. Create user");
 			System.out.println("3. Update user's password");
-			System.out.println("4. Delete user");
-			System.out.println("5. Logout");
+			System.out.println("4. Update user's username");
+			System.out.println("5. Delete user");
+			System.out.println("6. Logout");
 			
-			if (inputScan.nextInt() == 1) 
-			{
-				ViewUsers();
-			}
-			else if (inputScan.nextInt() == 2) 
-			{
-				try 
+			try {
+				if (inputScan.nextInt() == 1) 
 				{
-					register();
-					
-				}catch(UsernameTakenException ute) 
-				{
-					System.out.println(ute.getMessage());
-					
+					ViewUsers();
 				}
+				else if (inputScan.nextInt() == 2) 
+				{
+					try 
+					{
+						register();
+					
+					}
+					catch(UsernameTakenException ute) 
+					{
+						System.out.println(ute.getMessage());
+					
+					}
 				
+				}
+				else if (inputScan.nextInt() == 3) 
+				{
+					UpdateUserPassword();
+				}
+				else if (inputScan.nextInt() == 4) 
+				{
+					try 
+					{
+						UpdateUsersUserName();
+					
+					}
+					catch(UsernameTakenException ute) 
+					{
+						System.out.println(ute.getMessage());
+					
+					}
+				
+				}
+				else if (inputScan.nextInt() == 5) 
+				{
+					DeleteUser();		
+				}
+				else if (inputScan.nextInt() == 6) 
+				{
+					System.out.println("Logging off of superuser account");
+					break;
+				}
 			}
-			else if (inputScan.nextInt() == 3) 
+			catch(InputMismatchException ime) 
 			{
-				UpdateUserPassword();
+				System.out.println("Invalid choice");
 			}
-			else if (inputScan.nextInt() == 4) 
-			{
-				DeleteUser();		
-			}
-			else if (inputScan.nextInt() == 5) 
-			{
-				System.out.println("Logging off of superuser account");
-				break;
-			}
-			
 		}	
 	}
 
@@ -620,6 +661,28 @@ public class App
 			serv.updateUserPassword(username, pwordSecondAttmpt);
 			
 		}
+		else 
+		{
+			System.out.println("Passwords didn't match, please try again");
+		}
+		
+	}
+	
+	private static void UpdateUsersUserName() 
+	{
+		UserService serv = UserService.getService();
+		
+		Scanner inputScan = ScannerSingleton.getScanner();
+		
+		System.out.print("Enter username of user to update: ");
+		
+		String username = inputScan.next();
+		
+		System.out.print("Enter new username: ");
+		
+		String newUsername = inputScan.next();
+
+		serv.updateUserName(username, newUsername);
 		
 	}
 

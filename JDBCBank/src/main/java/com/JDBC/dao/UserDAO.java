@@ -47,7 +47,7 @@ public class UserDAO implements IUserDAO
 	{
 		Connection con = ConnectionUtility.getConnection();
 		
-		if (con == null) 
+		if (con == null)
 		{
 			return log.traceExit(Optional.empty());	
 		}
@@ -72,20 +72,59 @@ public class UserDAO implements IUserDAO
 			
 		} catch(SQLException e) 
 		{
+			
 			log.catching(e);
 			log.error("A SQLException has occured.");
 			
-			try 
-			{
-				con.close();
-			}catch(SQLException e1) 
-			{
-				log.catching(e1);
-				log.error("An exception occured while attemping to close the connection object.");
-			}
+			/*
+			 * try { con.close(); }catch(SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attemping to close the connection object."
+			 * ); }
+			 */
 			
 		}
 		return log.traceExit(Optional.empty());
+	}
+	
+	public Optional<User> getUser(long userid)
+	{
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) 
+		{
+			return log.traceExit(Optional.empty());	
+		}
+		
+		try 
+		{
+			String query = "SELECT * FROM users WHERE userid = ?";
+			
+			PreparedStatement queryStmt = con.prepareStatement(query);
+			
+			queryStmt.setLong(1, userid);
+			
+			ResultSet rs = queryStmt.executeQuery();
+			
+			rs.next();
+			
+			User user = new User(rs.getString("username"), rs.getLong("userid"));
+			
+			return log.traceExit(Optional.of(user));
+			
+		} catch(SQLException e) 
+		{
+			log.catching(e);
+			log.error("A SQLException has occured.");
+			
+			/*
+			 * try { con.close(); }catch(SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attemping to close the connection object."
+			 * ); }
+			 */
+			
+		}
+		return log.traceExit(Optional.empty());
+		
 	}
 
 	@Override
@@ -116,12 +155,11 @@ public class UserDAO implements IUserDAO
 		{
 			log.catching(e);
 			log.error("An SQLException has occured.");
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("An exception occured while attempting to close the connection object");
-			}
+			/*
+			 * try { con.close(); } catch (SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attempting to close the connection object"
+			 * ); }
+			 */
 		}
 		return log.traceExit(Optional.empty());
 	}
@@ -167,12 +205,11 @@ public class UserDAO implements IUserDAO
 			{
 				log.catching(e);
 				log.error("An SQLException has occured.");
-				try {
-					con.close();
-				} catch (SQLException e1) {
-					log.catching(e1);
-					log.error("An exception occured while attempting to close the connection object");
-				}
+				/*
+				 * try { con.close(); } catch (SQLException e1) { log.catching(e1); log.
+				 * error("An exception occured while attempting to close the connection object"
+				 * ); }
+				 */
 				log.traceExit(Optional.empty());
 			}
 		}
@@ -207,18 +244,18 @@ public class UserDAO implements IUserDAO
 		{
 			log.catching(e);
 			log.error("An SQLException has occured");
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("An exception occured while attempting to close the connection object");
-			}
+			/*
+			 * try { con.close(); } catch (SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attempting to close the connection object"
+			 * ); }
+			 */
 		}
 		log.traceExit();
 	}
-
+	
 	@Override
-	public void deleteUser(String userName) {
+	public void updateUserName(String oldUserName, String newUserName) 
+	{
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) 
@@ -228,30 +265,79 @@ public class UserDAO implements IUserDAO
 		}
 		try 
 		{
+			String query = "CALL updateusername(?, ?)";
 			
-			String query = "CALL removeuser(?)"; //Should return the generated user id...
+			CallableStatement queryStmt = con.prepareCall(query);
+			
+			queryStmt.setString(1,  oldUserName);
+			
+			queryStmt.setString(2,  newUserName);
+			
+			queryStmt.execute();
+			
+			log.traceExit();
+			
+		} catch(SQLException e) 
+		{
+			if (e.getCause() instanceof SQLIntegrityConstraintViolationException) 
+			{
+				UsernameTakenException ute = new UsernameTakenException("Username already taken!");
+				log.catching(ute);
+				throw ute;
+				
+			}
+			log.catching(e);
+			log.error("An SQLException has occured");
+			/*
+			 * try { con.close(); } catch (SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attempting to close the connection object"
+			 * ); }
+			 */
+		}
+		log.traceExit();
+		
+	}
+
+	@Override
+	public long deleteUser(String userName) {
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) 
+		{
+			log.traceExit();
+			return -1;	
+		}
+		try 
+		{	
+			String query = "CALL removeuser(?, ?)"; //Should return the generated user id...
 			
 			CallableStatement queryStmt = con.prepareCall(query);
 			
 			queryStmt.setString(1,  userName);
 			
+			long id = 0;
+			
+			queryStmt.registerOutParameter(2, Types.NUMERIC);
+			
 			queryStmt.execute();
 			
 			log.traceExit();
+			
+			return id;
 			
 			
 		} catch(SQLException e)
 		{
 			log.catching(e);
 			log.error("An SQLException has occured");
-			try {
-				con.close();
-			} catch (SQLException e1) {
-				log.catching(e1);
-				log.error("An exception occured while attempting to close the connection object");
-			}
+			/*
+			 * try { con.close(); } catch (SQLException e1) { log.catching(e1); log.
+			 * error("An exception occured while attempting to close the connection object"
+			 * ); }
+			 */
 		}
 		log.traceExit();
+		return -1;
 		
 	}
 }

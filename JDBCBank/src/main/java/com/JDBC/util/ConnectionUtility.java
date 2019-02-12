@@ -25,7 +25,7 @@ public class ConnectionUtility
 		try {
 			Properties props = new Properties();
 			in = new FileInputStream(
-					"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBCBank\\Resource\\connection.properties");
+					"C:\\Users\\LTCHIPS\\Documents\\Revature\\Project0\\project-zero-LTCHIPS\\JDBCBank\\src\\main\\java\\com\\JDBC\\Resources\\connection.properties");
 			props.load(in);
 
 			Class.forName("oracle.jdbc.driver.OracleDriver");

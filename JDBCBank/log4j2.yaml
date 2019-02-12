@@ -1,0 +1,34 @@
+Configuration:
+  name: Default
+
+  Properties:
+  
+    Property:
+      - name: log_path
+        value: logs
+      
+  Appenders:
+  
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"
+        
+    File:
+      name: File_Appender
+      fileName: ${log_path}/logfile.log
+      PatternLayout:
+        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+        
+  Loggers:
+  
+    Root:
+      level: trace
+      AppenderRef:
+        - ref: File_Appender
+        
+    com.JDBC.util.ConnectionUtility:
+      level: trace
+      AppenderRef:
+        - ref: File_Appender

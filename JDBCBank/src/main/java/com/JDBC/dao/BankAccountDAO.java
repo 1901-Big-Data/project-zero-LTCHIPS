@@ -36,10 +36,9 @@ public class BankAccountDAO implements IBankAccountDAO {
 		if (dao == null) 
 		{
 			dao = new BankAccountDAO();
-			
 		}
-		return dao;
 		
+		return dao;
 	}
 
 	@Override
@@ -121,6 +120,42 @@ public class BankAccountDAO implements IBankAccountDAO {
 		return Optional.empty();
 		
 	}
+	
+	@Override
+	public Optional<BankAccount> getBankAccount(long bankAccountId) {
+		log.traceEntry();
+		Connection con = ConnectionUtility.getConnection();
+		
+		if (con == null) {
+			log.traceExit(Optional.empty());
+			return Optional.empty();
+		}
+
+		try {
+			String sql = "select * from bankaccount where accountid = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			
+			ps.setLong(1, bankAccountId);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			return log.traceExit(Optional.of(new BankAccount(rs.getLong(1), rs.getLong(4), rs.getString(2))));
+		} catch (SQLException e) 
+		{
+			log.catching(e);
+			log.error("An SQLException has occured." , e);
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				log.catching(e1);
+				log.error("There was a problem in attempting to close the connection for the database.", e1);
+			}
+		}
+		log.traceExit(Optional.empty());
+		return Optional.empty();
+		
+	}
+	
 
 	@Override
 	public void depositIntoBankAccount(double amount, long accountid) throws NegativeDepositException 

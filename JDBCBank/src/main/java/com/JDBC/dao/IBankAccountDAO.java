@@ -22,4 +22,6 @@ public interface IBankAccountDAO
 	Optional<BankAccount> addBankAccount(String bankAccountName, long userid);
 	
 	void deleteBankAccount(long accountId);
+
+	Optional<BankAccount> getBankAccount(long bankAccountId);
 }

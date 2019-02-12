@@ -43,7 +43,7 @@ public class BankAccountDAO implements IBankAccountDAO {
 
 	@Override
 	public Optional<List<BankAccount>> getAllBankAccounts() {
-		
+		log.traceEntry();
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {
@@ -174,11 +174,11 @@ public class BankAccountDAO implements IBankAccountDAO {
 		return Optional.empty();
 		
 	}
-	
 
 	@Override
 	public void depositIntoBankAccount(double amount, long accountid) throws NegativeDepositException 
 	{
+		log.traceEntry();
 		if (amount < 0.0) 
 		{
 			NegativeDepositException nde = new NegativeDepositException("Cannot deposit negative amounts into account!");
@@ -219,7 +219,7 @@ public class BankAccountDAO implements IBankAccountDAO {
 
 	@Override
 	public void withdrawlFunds(double amountToWithdrawl, long accountid) throws NegativeWithdrawlException {
-		
+		log.traceEntry();
 		if (amountToWithdrawl < 0.0) 
 		{
 			NegativeWithdrawlException nwe = new NegativeWithdrawlException("Cannot withdraw negative amounts from account!");
@@ -260,6 +260,7 @@ public class BankAccountDAO implements IBankAccountDAO {
 
 	@Override
 	public Optional<BankAccount> addBankAccount(String bankAccountName, long userid) {
+		log.traceEntry();
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {
@@ -299,6 +300,7 @@ public class BankAccountDAO implements IBankAccountDAO {
 	@Override
 	public void deleteBankAccount(long accountId) 
 	{
+		log.traceEntry();
 		Connection con = ConnectionUtility.getConnection();
 		
 		if (con == null) {

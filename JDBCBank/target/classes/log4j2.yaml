@@ -27,16 +27,22 @@ Configuration:
       level: trace
       AppenderRef:
         - ref: File_Appender
-    
+
       name: com.JDBC.dao.UserDAO
       level: trace
       AppenderRef:
         - ref: File_Appender
-    
+
       name: com.JDBC.dao.BankAccountDAO
       level: trace
       AppenderRef:
         - ref: File_Appender
+
+      name: com.example.JDBCBank.UnitTests
+      level: info
+      AppenderRef:
+        - ref: File_Appender
+
     Root:
       level: trace
       AppenderRef:

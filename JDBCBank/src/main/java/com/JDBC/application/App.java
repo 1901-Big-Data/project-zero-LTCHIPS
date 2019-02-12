@@ -303,7 +303,7 @@ public class App
 			System.out.print((x + 1) + ": ");
 			
 			System.out.print("Name: ");
-			System.out.print(userBankAccounts.get(x).getName() + "\t");
+			System.out.print(userBankAccounts.get(x).getName());
 			//System.out.print("\t");
 			
 			System.out.print("Funds: $");

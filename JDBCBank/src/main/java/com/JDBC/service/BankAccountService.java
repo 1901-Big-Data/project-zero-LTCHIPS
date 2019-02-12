@@ -15,9 +15,8 @@ public class BankAccountService {
 	
 	final static BankAccountDAO bankDAO = BankAccountDAO.getDao();
 	
-	private BankAccountService() 
+	private BankAccountService()
 	{
-		
 		
 	}
 	
@@ -29,7 +28,6 @@ public class BankAccountService {
 			
 		}
 		return bankServ;
-		
 	}
 	
 	public Optional<List<BankAccount>> getAllBankAccounts()

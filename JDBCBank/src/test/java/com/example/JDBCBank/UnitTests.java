@@ -4,22 +4,27 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.JDBC.Exceptions.NegativeWithdrawlException;
+import com.JDBC.dao.UserDAO;
 import com.JDBC.model.BankAccount;
 import com.JDBC.model.User;
 import com.JDBC.service.BankAccountService;
 import com.JDBC.service.UserService;
 import com.JDBC.util.ConnectionUtility;
 
-public class AppTestTest {
+public class UnitTests {
 
     long testUserId;
 	
@@ -31,12 +36,17 @@ public class AppTestTest {
 	
     public ExpectedException expectedException = ExpectedException.none();
 
+    private static final Logger log = LogManager.getLogger(UnitTests.class);
     
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception 
 	{
 		
+		log.info("Began Setup");
+		
 		tearDownAfterClass();
+		
+		Connection con = ConnectionUtility.getConnection();
 		
         UserService userServ = UserService.getService();
         
@@ -55,11 +65,14 @@ public class AppTestTest {
         bankServ.addBankAccount("testdeletebankaccount", userid);
         	
         bankServ.depositIntoBankAccount(555, withdrawlId);
+        
+        log.info("Setup Complete, running Unit Test(s)");
 		
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		log.info("Beginning teardown");
 		
 		Connection con = ConnectionUtility.getConnection();
 		
@@ -73,30 +86,37 @@ public class AppTestTest {
 				
 			ps2.execute();
 			
-		}catch(Exception e) 
+		}
+		catch(Exception e) 
 		{
+			log.error("TEAR DOWN FAILED OH NO");
+			log.catching(e);
 			con.close();
-			
 		}
 		
-		
+		log.info("Teardown complete");
 		
 	}
 
 	@Test
 	public void TestDepositShouldReturnNonZero() 
 	{	
+		log.info("Beginning TestDepositShouldReturnZero");
+		
 		BankAccountService bankServ = BankAccountService.getService();
 		
 		bankServ.depositIntoBankAccount(256, depositAccntId);
 		
 		assertEquals(256, Math.round(bankServ.getBankAccount(depositAccntId).get().getBalance()), 0.0000001);
 		
+		log.info("Ending TestDepositShouldReturnZero");
 	}
 	
 	@Test
 	public void TestWithdrawl() 
 	{
+		log.info("Beginning TestWithdrawl");
+		
 		BankAccountService bankServ = BankAccountService.getService();
 		
 		bankServ.withdrawFromBankAccount(100.0, withdrawlAccntId);
@@ -107,11 +127,15 @@ public class AppTestTest {
 		
 		assertEquals(455.0, newAmount, 0.00001);
 		
+		log.info("Ending TestWithdrawl");
+		
 	}
 
 	@Test
 	public void TestUserRegister() 
 	{
+		log.info("Beginning TestUserRegister");
+		
 		UserService userServ = UserService.getService();
 		
 		User user;
@@ -120,14 +144,17 @@ public class AppTestTest {
 		
 		assertNotEquals(Optional.empty(), userServ.getUser(user.getUserID()));
 		
+		log.info("Ending TestUserRegister");
+		
 	}
 	
 	@Test
 	public void TestNonExistentUserShouldThrow() 
 	{
-		UserService userServ = UserService.getService();
 		
-		expectedException.expect(NoSuchElementException.class); 
+		log.info("Beginning TestNonExistentUserShouldThrow");
+		
+		UserService userServ = UserService.getService(); 
 		
 		try 
 		{
@@ -139,10 +166,14 @@ public class AppTestTest {
 			//it failed! WOOOOOOOOOOOOOOOO!
 			
 		}
+		log.info("Ending TestNonExistentUserShouldThrow");
 	}
+	
 	@Test
 	public void TestDeleteUser() 
 	{
+		log.info("Beginning TestDeleteUser");
+		
 		UserService userServ = UserService.getService();
 		
 		long delid = userServ.deleteUser("deleteme");
@@ -157,12 +188,13 @@ public class AppTestTest {
 			
 		}
 		
-		
+		log.info("Ending TestDeleteUser");
 	}
 	
 	@Test
 	public void TestNegativeWithdrawlShouldThrow() 
 	{
+		log.info("Beginning TestNegativeWithrawlShouldThrow");
 		BankAccountService bankServ = BankAccountService.getService();
 		
 		try 
@@ -173,13 +205,15 @@ public class AppTestTest {
 		}catch(NegativeWithdrawlException nwe) 
 		{
 			
-			
 		}
+		log.info("Ending TestNegativeWithdrawlShouldThrow");
 	}
 	
 	@Test
 	public void TestDeleteBankAccount() 
 	{
+		log.info("Beginning TestDeleteBankAccount");
+		
 		BankAccountService bankServ = BankAccountService.getService();
 		
 		bankServ.deleteBankAccount(deleteBankAccountId);
@@ -194,11 +228,8 @@ public class AppTestTest {
 			
 			
 		}
+		log.info("Ending TestDeleteBankAccount");
 		
 	}
 	
-	
-	
-	
-
 }

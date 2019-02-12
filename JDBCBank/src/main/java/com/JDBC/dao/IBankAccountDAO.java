@@ -24,6 +24,6 @@ public interface IBankAccountDAO
 	void deleteBankAccount(long accountId);
 
 	Optional<BankAccount> getBankAccount(long bankAccountId);
-
+	
 	Optional<BankAccount> getBankAccount(String bankAccountName);
 }

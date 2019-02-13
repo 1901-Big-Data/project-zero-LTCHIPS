@@ -19215,3 +19215,78 @@ java.sql.SQLException: Result set after last row
 [TRACE] 2019-02-13 10:51:16.954 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@74287ea3, com.JDBC.model.BankAccount@7d7758be]])
 [TRACE] 2019-02-13 10:51:19.796 [main] BankAccountDAO - Enter
 [TRACE] 2019-02-13 10:51:19.804 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@2bdd8394, com.JDBC.model.BankAccount@5f9edf14]])
+[ERROR] 2019-02-13 11:07:11.551 [main] UserDAO - Catching
+java.sql.SQLException: Result set after last row
+	at oracle.jdbc.driver.GeneratedScrollableResultSet.getString(GeneratedScrollableResultSet.java:879) ~[ojdbc7.jar:12.1.0.1.0]
+	at oracle.jdbc.driver.GeneratedResultSet.getString(GeneratedResultSet.java:1460) ~[ojdbc7.jar:12.1.0.1.0]
+	at com.JDBC.dao.UserDAO.login(UserDAO.java:69) [classes/:?]
+	at com.JDBC.service.UserService.login(UserService.java:36) [classes/:?]
+	at com.JDBC.application.App.LoopLogin(App.java:104) [classes/:?]
+	at com.JDBC.application.App.main(App.java:566) [classes/:?]
+[ERROR] 2019-02-13 11:07:11.557 [main] UserDAO - A SQLException has occured.
+[TRACE] 2019-02-13 11:07:11.557 [main] UserDAO - Exit with(Optional.empty)
+[TRACE] 2019-02-13 11:07:35.155 [main] UserDAO - Exit with(Optional[com.JDBC.model.User@3214ee6])
+[TRACE] 2019-02-13 11:07:44.304 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:07:44.315 [main] BankAccountDAO - Exit with(Optional[[]])
+[TRACE] 2019-02-13 11:08:03.410 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:03.425 [main] BankAccountDAO - Exit with(Optional[com.JDBC.model.BankAccount@a8ef162])
+[TRACE] 2019-02-13 11:08:05.697 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:05.707 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@2eea88a1]])
+[TRACE] 2019-02-13 11:08:07.997 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:08.017 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:08:08.017 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:08:13.504 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:13.511 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@7ac296f6]])
+[TRACE] 2019-02-13 11:08:19.135 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:19.143 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@7fd7a283]])
+[TRACE] 2019-02-13 11:08:25.315 [main] BankAccountDAO - Enter
+[ERROR] 2019-02-13 11:08:25.315 [main] BankAccountDAO - Catching
+com.JDBC.Exceptions.NegativeDepositException: Cannot deposit negative amounts into account!
+	at com.JDBC.dao.BankAccountDAO.depositIntoBankAccount(BankAccountDAO.java:184) [classes/:?]
+	at com.JDBC.service.BankAccountService.depositIntoBankAccount(BankAccountService.java:60) [classes/:?]
+	at com.JDBC.application.App.DepositIntoAccount(App.java:417) [classes/:?]
+	at com.JDBC.application.App.dashboard(App.java:205) [classes/:?]
+	at com.JDBC.application.App.main(App.java:575) [classes/:?]
+[ERROR] 2019-02-13 11:08:25.315 [main] BankAccountDAO - Cannot deposit negative amounts into account!
+com.JDBC.Exceptions.NegativeDepositException: Cannot deposit negative amounts into account!
+	at com.JDBC.dao.BankAccountDAO.depositIntoBankAccount(BankAccountDAO.java:184) [classes/:?]
+	at com.JDBC.service.BankAccountService.depositIntoBankAccount(BankAccountService.java:60) [classes/:?]
+	at com.JDBC.application.App.DepositIntoAccount(App.java:417) [classes/:?]
+	at com.JDBC.application.App.dashboard(App.java:205) [classes/:?]
+	at com.JDBC.application.App.main(App.java:575) [classes/:?]
+[TRACE] 2019-02-13 11:08:31.617 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:31.624 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@22f59fa]])
+[TRACE] 2019-02-13 11:08:33.233 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:33.449 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:08:33.449 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:08:35.447 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:35.470 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@78fa769e]])
+[TRACE] 2019-02-13 11:08:39.191 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:39.207 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@16612a51]])
+[TRACE] 2019-02-13 11:08:49.256 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:49.264 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@54e041a4]])
+[TRACE] 2019-02-13 11:08:52.680 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:52.689 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:08:54.016 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:08:54.022 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@2c78324b]])
+[TRACE] 2019-02-13 11:09:06.208 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:09:06.231 [main] BankAccountDAO - Exit with(Optional[com.JDBC.model.BankAccount@79defdc])
+[TRACE] 2019-02-13 11:09:07.678 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:09:07.687 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@18317edc, com.JDBC.model.BankAccount@4e0ae11f]])
+[TRACE] 2019-02-13 11:09:22.986 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:09:23.002 [main] BankAccountDAO - Exit with(Optional[[com.JDBC.model.BankAccount@238d68ff, com.JDBC.model.BankAccount@4b86805d]])
+[TRACE] 2019-02-13 11:09:24.821 [main] BankAccountDAO - Enter
+[TRACE] 2019-02-13 11:09:24.835 [main] BankAccountDAO - Exit
+[TRACE] 2019-02-13 11:09:24.835 [main] BankAccountDAO - Exit
+[ERROR] 2019-02-13 11:09:45.662 [main] UserDAO - Catching
+java.sql.SQLException: Result set after last row
+	at oracle.jdbc.driver.GeneratedScrollableResultSet.getString(GeneratedScrollableResultSet.java:879) ~[ojdbc7.jar:12.1.0.1.0]
+	at oracle.jdbc.driver.GeneratedResultSet.getString(GeneratedResultSet.java:1460) ~[ojdbc7.jar:12.1.0.1.0]
+	at com.JDBC.dao.UserDAO.login(UserDAO.java:69) [classes/:?]
+	at com.JDBC.service.UserService.login(UserService.java:36) [classes/:?]
+	at com.JDBC.application.App.LoopLogin(App.java:104) [classes/:?]
+	at com.JDBC.application.App.main(App.java:566) [classes/:?]
+[ERROR] 2019-02-13 11:09:45.662 [main] UserDAO - A SQLException has occured.
+[TRACE] 2019-02-13 11:09:45.662 [main] UserDAO - Exit with(Optional.empty)
+[TRACE] 2019-02-13 11:09:59.474 [main] UserDAO - Exit with(Optional[[com.JDBC.model.User@5852c06f, com.JDBC.model.User@4149c063, com.JDBC.model.User@9cb8225]])
+[TRACE] 2019-02-13 11:10:33.639 [main] UserDAO - Exit

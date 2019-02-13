@@ -120,6 +120,8 @@ public class App
 			}
 		}
 		
+		System.out.println("Welcome, " + returnUser.getUserName());
+		
 		return returnUser;
 		
 	}
@@ -130,20 +132,19 @@ public class App
 		BankAccountService bankService = BankAccountService.getService();
 		List<BankAccount> userBankAccounts = bankService.getAllUsersBankAccounts(curUser.getUserID()).get();
 		
+		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		if (userBankAccounts.isEmpty()) 
 		{
 			System.out.println("User currently has no bank accounts");
-			
+			return;
 		}
-		
-		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
 		{
-			System.out.print((x + 1) + ":");
+			System.out.print((x + 1) + ": ");
 			
-			System.out.print("Name: ");
+			System.out.print(" Name: ");
 			System.out.print(userBankAccounts.get(x).getName());
-			System.out.println("\t \t");
+			System.out.print("\t");
 			
 			System.out.print("Funds: $");
 			System.out.print(userBankAccounts.get(x).getBalance());
@@ -159,7 +160,7 @@ public class App
 		
 		while(true) 
 		{
-			
+			System.out.println();
 			System.out.println("=====================MAIN MENU=======================");
 			System.out.println("1. Create a bank account");
 			System.out.println("2. Views your current account balances");
@@ -169,16 +170,22 @@ public class App
 			System.out.println("6. Logout");
 			
 			System.out.print(">");
+			
+			String inputStr = inputScan.next();
+			
+			inputScan.nextLine();
+			
+			
 			try {
-				if (inputScan.nextInt() == 1) 
+				if (inputStr.equals("1")) 
 				{
 					CreateAccount(curUser);
 				}
-				else if (inputScan.nextInt() == 2) 
+				else if (inputStr.equals("2")) 
 				{
 					PrintBankAccounts(curUser);
 				}
-				else if (inputScan.nextInt() == 3) 
+				else if (inputStr.equals("3")) 
 				{
 					try {
 						DeleteAccount(curUser);
@@ -192,7 +199,7 @@ public class App
 						System.out.println(efinae.getMessage());
 					}
 				}
-				else if (inputScan.nextInt() == 4) 
+				else if (inputStr.equals("4")) 
 				{
 					try {
 						DepositIntoAccount(curUser);
@@ -207,7 +214,7 @@ public class App
 					}
 				
 				}
-				else if (inputScan.nextInt() == 5) 
+				else if (inputStr.equals("5")) 
 				{
 					try {
 						WithdrawFromAccount(curUser);
@@ -221,15 +228,23 @@ public class App
 						System.out.println(nwe.getMessage());
 					}
 				}
-				else if (inputScan.nextInt() == 6) 
+				else if (inputStr.equals("6")) 
 				{
+					System.out.println();
+					
 					System.out.println("Logging off, have a nice day!");
 					break;
+				}
+				else 
+				{
+					System.out.println("Invalid Choice");
+					continue;
+					
 				}
 			}
 			catch(InputMismatchException ime) 
 			{
-				System.out.println("Invalid choice");
+				System.out.println("Invalid Choice");
 			}
 		}
 		
@@ -254,7 +269,14 @@ public class App
 			while(true) 
 			{
 				System.out.print("Choose Account to withdraw from: ");
-				chosenAccount = inputScan.nextInt();
+				try {
+					chosenAccount = Integer.parseInt(inputScan.next());
+				}catch(NumberFormatException nfe) 
+				{
+					System.out.println("Invalid choice");
+					continue;
+					
+				}
 				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
 				{
 					System.out.println("Invalid choice");
@@ -277,34 +299,41 @@ public class App
 		
 		
 		System.out.print("Enter amount to Withdraw: ");
-		
-		double amountToWithdraw = inputScan.nextDouble();
-		
-		if (bankAccount.getBalance() < amountToWithdraw) 
+		double amountToWithdraw;
+		try {
+			amountToWithdraw = Double.parseDouble(inputScan.next());
+		}
+		catch(NumberFormatException nfe) 
+		{
+			System.out.println("Invalid number");
+			return;
+		}
+		if (bankAccount.getBalance() < amountToWithdraw)
 		{
 			throw new InsufficientFundsException("Insufficient Funds");
 		}
 		
-		bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID()); 
+		bankService.withdrawFromBankAccount(amountToWithdraw, bankAccount.getAccountID());
 		
 	}
 
 	private static void PrintBankAccounts(User curUser, List<BankAccount> userBankAccounts) 
 	{
+		
+		
+		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		if (userBankAccounts.isEmpty()) 
 		{
 			System.out.println("User currently has no bank accounts");
-			
+			return;
 		}
-		
-		System.out.println(curUser.getUserName() + "'s Current Bank Accounts: \n");
 		for (int x = 0; x < userBankAccounts.size(); x++) 
 		{
 			System.out.print((x + 1) + ": ");
 			
-			System.out.print("Name: ");
+			System.out.print(" Name: ");
 			System.out.print(userBankAccounts.get(x).getName());
-			//System.out.print("\t");
+			System.out.print("\t");
 			
 			System.out.print("Funds: $");
 			System.out.print(userBankAccounts.get(x).getBalance());
@@ -335,7 +364,16 @@ public class App
 			while(true) 
 			{
 				System.out.print("Choose Account to deposit into: ");
-				chosenAccount = inputScan.nextInt();
+				try 
+				{
+					chosenAccount = Integer.parseInt(inputScan.next());
+				}catch(NumberFormatException nfe) 
+				{
+					System.out.println("Invalid choice");
+					continue;
+					
+				}
+				
 				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
 				{
 					System.out.println("Invalid choice");
@@ -361,10 +399,20 @@ public class App
 			bankid = userBankAccounts.get(0).getAccountID();
 		}
 		
-		
-		
 		System.out.print("Specify how much you wish to deposit: ");
-		Double amountToDeposit = inputScan.nextDouble();
+		
+		double amountToDeposit;
+		
+		try 
+		{
+			amountToDeposit = Double.parseDouble(inputScan.next());	
+		}
+		catch(NumberFormatException nfe) 
+		{
+			System.out.println("Invalid number");
+			return;
+		}
+		
 		
 		bankService.depositIntoBankAccount(amountToDeposit, bankid);
 		
@@ -390,11 +438,18 @@ public class App
 			while(true) 
 			{
 				System.out.print("Choose Account to delete: ");
-				chosenAccount = inputScan.nextInt();
+				try {
+					chosenAccount = Integer.parseInt(inputScan.next());
+				}catch( NumberFormatException nfe)
+				{
+					System.out.println("Invalid choice");
+					continue;
+				}
+				inputScan.nextLine();
+				
 				if (chosenAccount - 1 >= userBankAccounts.size() || chosenAccount - 1 < 0)
 				{
 					System.out.println("Invalid choice");
-					
 				}
 				else 
 				{
@@ -465,7 +520,7 @@ public class App
 			}			
 
 			newUser = userService.register(userNameIn, passwordIn).get();
-				
+			
 			
 			if (newUser != null) 
 			{
@@ -484,11 +539,14 @@ public class App
     {
     	Scanner scanner = ScannerSingleton.getScanner();    	
     	
-    	printGreeting();
+    	
     	
     	while(true)
     	{
-    		System.out.println("Options: ");
+    		System.out.println("");
+    		//System.out.println("Welcome to JDBC Banking! ");
+    		printGreeting();
+    		
     		System.out.println("1. Login");
     		System.out.println("2. Register");
     		System.out.println("3. Exit");
@@ -498,7 +556,10 @@ public class App
     		
     		
     		try {
-    			if (scanner.nextInt() == 1) 
+    			String inputScan = scanner.next();
+    			scanner.nextLine();
+    			
+    			if (inputScan.equals("1")) 
     			{
     				User curUser = null;
     			
@@ -515,7 +576,7 @@ public class App
     				 
     				}
     			}
-    			else if (scanner.nextInt() == 2) 
+    			else if (inputScan.equals("2")) 
     			{
     				try 
     				{
@@ -528,7 +589,7 @@ public class App
     				}
     			
     			}
-    			else if (scanner.nextInt() == 3) 
+    			else if (inputScan.equals("3")) 
     			{
     				System.out.println("Exiting Application...");
     				break;
@@ -575,6 +636,7 @@ public class App
 		
 		while(true) 
 		{
+			System.out.println();
 			System.out.println("=====================ADMIN MENU=======================");
 			System.out.println("1. View users");
 			System.out.println("2. Create user");
@@ -583,14 +645,20 @@ public class App
 			System.out.println("5. Delete user");
 			System.out.println("6. Logout");
 			
+			System.out.print(">");
+			
+			String inputStr = inputScan.next();
+			
+			inputScan.nextLine();
+			
 			try {
-				if (inputScan.nextInt() == 1) 
+				if (inputStr.equals("1"))
 				{
 					ViewUsers();
 				}
-				else if (inputScan.nextInt() == 2) 
+				else if (inputStr.equals("2")) 
 				{
-					try 
+					try
 					{
 						register();
 					
@@ -602,11 +670,11 @@ public class App
 					}
 				
 				}
-				else if (inputScan.nextInt() == 3) 
+				else if (inputStr.equals("3")) 
 				{
 					UpdateUserPassword();
 				}
-				else if (inputScan.nextInt() == 4) 
+				else if (inputStr.equals("4")) 
 				{
 					try 
 					{
@@ -620,11 +688,11 @@ public class App
 					}
 				
 				}
-				else if (inputScan.nextInt() == 5) 
+				else if (inputStr.equals("5")) 
 				{
 					DeleteUser();		
 				}
-				else if (inputScan.nextInt() == 6) 
+				else if (inputStr.equals("6")) 
 				{
 					System.out.println("Logging off of superuser account");
 					break;
@@ -716,12 +784,12 @@ public class App
 			return;
 		}
 		
-		System.out.println("=========Current Users========");
+		System.out.println("================Current Users==============");
 		for(int x = 0; x < users.size(); x++) 
 		{
 			System.out.print("User: ");
 			System.out.print(users.get(x).getUserName());
-			System.out.print("\t \t " + "ID: ");
+			System.out.print("\t " + "ID: ");
 			System.out.println(users.get(x).getUserID());
 			
 		}

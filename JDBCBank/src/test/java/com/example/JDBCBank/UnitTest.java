@@ -24,7 +24,7 @@ import com.JDBC.service.BankAccountService;
 import com.JDBC.service.UserService;
 import com.JDBC.util.ConnectionUtility;
 
-public class UnitTests {
+public class UnitTest {
 
     long testUserId;
 	
@@ -36,12 +36,11 @@ public class UnitTests {
 	
     public ExpectedException expectedException = ExpectedException.none();
 
-    private static final Logger log = LogManager.getLogger(UnitTests.class);
+    private static final Logger log = LogManager.getLogger(UnitTest.class);
     
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception 
 	{
-		
 		log.info("Began Setup");
 		
 		tearDownAfterClass();
